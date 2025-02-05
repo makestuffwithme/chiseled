@@ -1,0 +1,46 @@
+{
+    "rules": [
+        {
+            "name": "Tauri v2 and Code Quality",
+            "description": "Ensure Tauri v2 is used and check for linting/compiler errors",
+            "checks": [
+                {
+                    "type": "dependency_version",
+                    "file": "src-tauri/Cargo.toml",
+                    "dependency": "tauri",
+                    "version": "^2.0.0",
+                    "message": "Project must use Tauri v2"
+                },
+                {
+                    "type": "dependency_version",
+                    "file": "package.json",
+                    "dependency": "@tauri-apps/api",
+                    "version": "^2.0.0",
+                    "message": "Project must use Tauri API v2"
+                },
+                {
+                    "type": "command",
+                    "command": "cargo check",
+                    "cwd": "src-tauri",
+                    "message": "Rust code must compile without errors"
+                },
+                {
+                    "type": "command",
+                    "command": "cargo clippy",
+                    "cwd": "src-tauri",
+                    "message": "Rust code must pass clippy lints"
+                },
+                {
+                    "type": "command",
+                    "command": "npm run check",
+                    "message": "TypeScript code must type check"
+                },
+                {
+                    "type": "command",
+                    "command": "npm run lint",
+                    "message": "Frontend code must pass linting"
+                }
+            ]
+        }
+    ]
+}
