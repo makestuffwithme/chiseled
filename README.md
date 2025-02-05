@@ -4,7 +4,7 @@ TODO: [download the latest release](https://github.com/nuttymode/chiseled-poe-tr
 
 ## showcase
 
-TODO: some pics
+![image](https://github.com/user-attachments/assets/5c1a085e-49e9-445b-ac48-426faa4ed1a1)
 
 ## acknowledgements
 
