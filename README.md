@@ -1,6 +1,4 @@
-# chiseled-poe-trade
-
-TODO: [download the latest release](https://github.com/nuttymode/chiseled-poe-trade/releases/latest)
+# [download the latest release](https://github.com/nuttymode/chiseled-poe-trade/releases/latest)
 
 ![image](https://github.com/user-attachments/assets/53ad8ef6-1f43-451c-b9d0-96b1db387cf9)
 
