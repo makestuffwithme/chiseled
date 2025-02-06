@@ -1,10 +1,10 @@
 [package]
-name = "app"
+name = "chiseled-poe-trade"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+description = "price check items in POE2"
+authors = ["nuttymode"]
+license = "MIT"
+repository = "https://github.com/nuttymode/chiseled-poe-trade"
 edition = "2021"
 rust-version = "1.77.2"
 
