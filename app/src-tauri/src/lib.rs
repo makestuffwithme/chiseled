@@ -88,10 +88,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![
-            search_trade,
-            minimize_window
-        ])
+        .invoke_handler(tauri::generate_handler![search_trade, minimize_window])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

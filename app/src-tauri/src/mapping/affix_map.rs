@@ -94,6 +94,12 @@ fn normalize_mod_text(text: &str) -> (String, Vec<f32>) {
         }
     }
 
+    let ailment_seconds_pattern = regex::Regex::new(r"You cannot be (Chilled|Frozen|Shocked|Ignited) for # seconds").unwrap();
+    if let Some(_caps) = ailment_seconds_pattern.captures(&normalized) {
+        // remove the s from seconds
+        normalized = normalized.replace("for # seconds", "for # second");
+    }
+
     (normalized, values)
 }
 
@@ -113,6 +119,7 @@ mod tests {
                     { "id": "explicit.stat_1940865751", "text": "Adds # to # Physical Damage" },
                     { "id": "explicit.stat_3885405204", "text": "Bow Attacks fire # additional Arrows" },
                     { "id": "explicit.stat_669069897", "text": "Leeches #% of Physical Damage as Mana" },
+                    { "id": "explicit.stat_2306924373", "text": "You cannot be Chilled for # second after being Chilled" },
                     { "id": "rune.stat_1509134228", "text": "#% increased Physical Damage" },
                     { "id": "implicit.stat_1980802737", "text": "Grenade Skills Fire an additional Projectile" }
                 ]
@@ -135,7 +142,6 @@ mod tests {
                 "explicit.stat_1940865751",
                 vec![6.0, 11.0],
             ),
-
             (
                 "+80 to Accuracy Rating",
                 "explicit",
@@ -160,7 +166,6 @@ mod tests {
                 "explicit.stat_669069897",
                 vec![5.85],
             ),
-
             (
                 "40% increased Physical Damage",
                 "rune",
@@ -172,6 +177,12 @@ mod tests {
                 "implicit",
                 "implicit.stat_1980802737",
                 vec![1.0],
+            ),
+            (
+                "You cannot be Chilled for 6 seconds after being Chilled",
+                "explicit",
+                "explicit.stat_2306924373",
+                vec![6.0],
             ),
         ];
 
