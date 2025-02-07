@@ -109,10 +109,12 @@ mod tests {
                 "entries": [
                     { "id": "explicit.stat_803737631", "text": "# to Accuracy Rating" },
                     { "id": "explicit.stat_210067635", "text": "#% increased Attack Speed" },
-                    { "id": "rune.stat_1509134228", "text": "#% increased Physical Damage" },
-                    { "id": "explicit.stat_3885405204", "text": "Bow Attacks fire # additional Arrow" },
+                    { "id": "explicit.stat_1509134228", "text": "#% increased Physical Damage" },
+                    { "id": "explicit.stat_1940865751", "text": "Adds # to # Physical Damage" },
+                    { "id": "explicit.stat_3885405204", "text": "Bow Attacks fire # additional Arrows" },
                     { "id": "explicit.stat_669069897", "text": "Leeches #% of Physical Damage as Mana" },
-                    { "id": "implicit.stat_1980802737", "text": "Grenade Skills Fire # additional Projectile" }
+                    { "id": "rune.stat_1509134228", "text": "#% increased Physical Damage" },
+                    { "id": "implicit.stat_1980802737", "text": "Grenade Skills Fire an additional Projectile" }
                 ]
             }]
         });
@@ -122,10 +124,23 @@ mod tests {
         // Test cases
         let test_cases = vec![
             (
-                "+105 to Accuracy Rating",
+                "42% increased Physical Damage",
+                "explicit",
+                "explicit.stat_1509134228",
+                vec![42.0],
+            ),
+            (
+                "Adds 6 to 11 Physical Damage",
+                "explicit",
+                "explicit.stat_1940865751",
+                vec![6.0, 11.0],
+            ),
+
+            (
+                "+80 to Accuracy Rating",
                 "explicit",
                 "explicit.stat_803737631",
-                vec![105.0],
+                vec![80.0],
             ),
             (
                 "12% increased Attack Speed",
@@ -134,16 +149,23 @@ mod tests {
                 vec![12.0],
             ),
             (
-                "40% increased Physical Damage",
-                "rune",
-                "rune.stat_1509134228",
-                vec![40.0],
-            ),
-            (
                 "Bow Attacks fire an additional Arrow",
                 "explicit",
                 "explicit.stat_3885405204",
                 vec![1.0],
+            ),
+            (
+                "Leeches 5.85% of Physical Damage as Mana",
+                "explicit",
+                "explicit.stat_669069897",
+                vec![5.85],
+            ),
+
+            (
+                "40% increased Physical Damage",
+                "rune",
+                "rune.stat_1509134228",
+                vec![40.0],
             ),
             (
                 "Grenade Skills Fire an additional Projectile",

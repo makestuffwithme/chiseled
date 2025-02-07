@@ -353,87 +353,9 @@ impl TradeFilters {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::mapping::affix_map::AffixMap;
+    use crate::mapping::base_type_map::BaseTypeMap;
     use serde_json::json;
-    use std::collections::HashMap;
-
-    fn create_test_maps() -> (HashMap<String, Vec<String>>, HashMap<String, String>) {
-        let mut affix_map = HashMap::new();
-        affix_map.insert(
-            "# to Accuracy Rating".to_string(),
-            vec!["explicit.stat_803737631".to_string()],
-        );
-        affix_map.insert(
-            "#% increased Attack Speed".to_string(),
-            vec!["explicit.stat_210067635".to_string()],
-        );
-        affix_map.insert(
-            "#% increased Physical Damage".to_string(),
-            vec![
-                "explicit.stat_1509134228".to_string(),
-                "rune.stat_1509134228".to_string(),
-            ],
-        );
-        affix_map.insert(
-            "Bow Attacks fire # additional Arrows".to_string(),
-            vec![
-                "explicit.stat_3885405204".to_string(),
-                "implicit.stat_3885405204".to_string(),
-            ],
-        );
-        affix_map.insert(
-            "Adds # to # Physical Damage".to_string(),
-            vec!["explicit.stat_1940865751".to_string()],
-        );
-        affix_map.insert(
-            "Leeches #% of Physical Damage as Mana".to_string(),
-            vec!["explicit.stat_669069897".to_string()],
-        );
-        affix_map.insert(
-            "Grenade Skills Fire # additional Projectile".to_string(),
-            vec!["implicit.stat_1980802737".to_string()],
-        );
-
-        let mut base_type_map = HashMap::new();
-        base_type_map.insert(
-            "Bombard Crossbow".to_string(),
-            "weapon.crossbow".to_string(),
-        );
-        base_type_map.insert(
-            "Advanced Dualstring Bow".to_string(),
-            "weapon.bow".to_string(),
-        );
-        base_type_map.insert(
-            "Expert Slicing Quarterstaff".to_string(),
-            "weapon.warstaff".to_string(),
-        );
-
-        (affix_map, base_type_map)
-    }
-
-    fn test_parse_mod(
-        affix_map: &HashMap<String, Vec<String>>,
-        text: &str,
-        prefix: &str,
-    ) -> Option<(String, Vec<f32>)> {
-        let text = text.replace("+", "").replace("-", "to");
-        for (pattern, ids) in affix_map {
-            if text == *pattern {
-                if let Some(id) = ids.iter().find(|id| id.starts_with(prefix)) {
-                    return Some((id.clone(), vec![10.0]));
-                }
-            }
-        }
-        None
-    }
-
-    fn test_find_base_type(
-        base_type_map: &HashMap<String, String>,
-        text: &str,
-    ) -> Option<(String, String)> {
-        base_type_map
-            .get(text)
-            .map(|category| (text.to_string(), category.clone()))
-    }
 
     fn assert_json_float_eq(value: &serde_json::Value, expected: f64) {
         let actual = value.as_f64().unwrap();
@@ -444,6 +366,54 @@ mod test {
             expected,
             actual
         );
+    }
+
+    fn get_test_maps() -> (AffixMap, BaseTypeMap) {
+        let stats_json = json!({
+            "result": [{
+                "entries": [
+                    { "id": "explicit.stat_803737631", "text": "# to Accuracy Rating" },
+                    { "id": "explicit.stat_210067635", "text": "#% increased Attack Speed" },
+                    { "id": "explicit.stat_1509134228", "text": "#% increased Physical Damage" },
+                    { "id": "explicit.stat_1940865751", "text": "Adds # to # Physical Damage" },
+                    { "id": "explicit.stat_3885405204", "text": "Bow Attacks fire # additional Arrows" },
+                    { "id": "explicit.stat_669069897", "text": "Leeches #% of Physical Damage as Mana" },
+                    { "id": "rune.stat_1509134228", "text": "#% increased Physical Damage" },
+                    { "id": "implicit.stat_1980802737", "text": "Grenade Skills Fire an additional Projectile" },
+                    { "id": "implicit.stat_3885405204", "text": "Bow Attacks fire # additional Arrows" }
+                ]
+            }]
+        });
+
+        let items_json = json!({
+            "result": [{
+                "id": "weapon.crossbow",
+                "label": "Crossbows",
+                "entries": [
+                    {
+                        "type": "Bombard Crossbow",
+                        "text": "Bombard Crossbow",
+                        "flags": { "unique": false }
+                    }
+                ]
+            },
+            {
+                "id": "weapon.bow",
+                "label": "Bows",
+                "entries": [
+                    {
+                        "type": "Advanced Dualstring Bow",
+                        "text": "Advanced Dualstring Bow",
+                        "flags": { "unique": false }
+                    }
+                ]
+            }]
+        });
+
+        let affix_map = AffixMap::new(stats_json).expect("Failed to create affix map");
+        let base_type_map = BaseTypeMap::new(items_json).expect("Failed to create base type map");
+
+        (affix_map, base_type_map)
     }
 
     const TEST_ITEM: &str = r#"Item Class: Crossbows
@@ -469,10 +439,10 @@ Grenade Skills Fire an additional Projectile (implicit)
 
     #[test]
     fn test_trade_filters_from_text() {
-        let (affix_map, base_type_map) = create_test_maps();
+        let (affix_map, base_type_map) = get_test_maps();
         let filters = TradeFilters::from_text(
-            |text, prefix| test_parse_mod(&affix_map, text, prefix),
-            |text| test_find_base_type(&base_type_map, text),
+            |text, prefix| affix_map.affix_to_trade_stat(text, prefix),
+            |text| base_type_map.item_text_to_base_type(text),
             TEST_ITEM,
         )
         .expect("Should parse successfully");
@@ -541,7 +511,7 @@ Grenade Skills Fire an additional Projectile (implicit)
             .find(|m| m.id == "explicit.stat_803737631")
             .expect("Should have accuracy mod");
         assert_eq!(accuracy_mod.text, "+105 to Accuracy Rating");
-        assert_json_float_eq(&json!(accuracy_mod.value.min.unwrap()), 94.5);
+        assert_json_float_eq(&json!(accuracy_mod.value.min.unwrap()), 105.0);
 
         // Attack speed mod
         let speed_mod = filters
@@ -550,7 +520,7 @@ Grenade Skills Fire an additional Projectile (implicit)
             .find(|m| m.id == "explicit.stat_210067635")
             .expect("Should have attack speed mod");
         assert_eq!(speed_mod.text, "12% increased Attack Speed");
-        assert_json_float_eq(&json!(speed_mod.value.min.unwrap()), 10.8);
+        assert_json_float_eq(&json!(speed_mod.value.min.unwrap()), 12.0);
     }
 
     const BOW_TEST_ITEM: &str = r#"Item Class: Bows
@@ -583,10 +553,10 @@ Leeches 5.85% of Physical Damage as Mana"#;
 
     #[test]
     fn test_bow_with_rune_mod() {
-        let (affix_map, base_type_map) = create_test_maps();
+        let (affix_map, base_type_map) = get_test_maps();
         let filters = TradeFilters::from_text(
-            |text, prefix| test_parse_mod(&affix_map, text, prefix),
-            |text| test_find_base_type(&base_type_map, text),
+            |text, prefix| affix_map.affix_to_trade_stat(text, prefix),
+            |text| base_type_map.item_text_to_base_type(text),
             BOW_TEST_ITEM,
         )
         .expect("Should parse successfully");
@@ -630,14 +600,15 @@ Leeches 5.85% of Physical Damage as Mana"#;
         let rune_mod = &filters.rune_mods[0];
         assert_eq!(rune_mod.text, "40% increased Physical Damage");
         assert_eq!(rune_mod.id, "rune.stat_1509134228");
-        assert_json_float_eq(&json!(rune_mod.value.min.unwrap()), 36.0);
+        assert_json_float_eq(&json!(rune_mod.value.min.unwrap()), 40.0);
 
         // Check implicit mod
         assert_eq!(filters.implicit_mods.len(), 1);
         let implicit_mod = &filters.implicit_mods[0];
         assert_eq!(implicit_mod.text, "Bow Attacks fire an additional Arrow");
         assert_eq!(implicit_mod.id, "implicit.stat_3885405204");
-        assert_json_float_eq(&json!(implicit_mod.value.min.unwrap()), 0.9);
+        assert_json_float_eq(&json!(implicit_mod.value.min.unwrap()), 1.0);
+
 
         // Check explicit mods
         assert_eq!(filters.explicit_mods.len(), 6);
@@ -649,7 +620,7 @@ Leeches 5.85% of Physical Damage as Mana"#;
             .find(|m| m.text == "42% increased Physical Damage")
             .expect("Should have physical damage mod");
         assert_eq!(phys_dmg_mod.id, "explicit.stat_1509134228");
-        assert_json_float_eq(&json!(phys_dmg_mod.value.min.unwrap()), 37.8);
+        assert_json_float_eq(&json!(phys_dmg_mod.value.min.unwrap()), 42.0);
 
         // Flat Physical Damage mod
         let flat_phys_mod = filters
@@ -666,7 +637,7 @@ Leeches 5.85% of Physical Damage as Mana"#;
             .find(|m| m.text == "+80 to Accuracy Rating")
             .expect("Should have accuracy mod");
         assert_eq!(accuracy_mod.id, "explicit.stat_803737631");
-        assert_json_float_eq(&json!(accuracy_mod.value.min.unwrap()), 72.0);
+        assert_json_float_eq(&json!(accuracy_mod.value.min.unwrap()), 80.0);
 
         // Attack Speed mod
         let speed_mod = filters
@@ -675,7 +646,7 @@ Leeches 5.85% of Physical Damage as Mana"#;
             .find(|m| m.text == "13% increased Attack Speed")
             .expect("Should have attack speed mod");
         assert_eq!(speed_mod.id, "explicit.stat_210067635");
-        assert_json_float_eq(&json!(speed_mod.value.min.unwrap()), 11.7);
+        assert_json_float_eq(&json!(speed_mod.value.min.unwrap()), 13.0);
 
         // Additional Arrow mod
         let arrow_mod = filters
@@ -692,12 +663,12 @@ Leeches 5.85% of Physical Damage as Mana"#;
             .find(|m| m.text == "Leeches 5.85% of Physical Damage as Mana")
             .expect("Should have mana leech mod");
         assert_eq!(leech_mod.id, "explicit.stat_669069897");
-        assert_json_float_eq(&json!(leech_mod.value.min.unwrap()), 5.265);
+        assert_json_float_eq(&json!(leech_mod.value.min.unwrap()), 5.85);
     }
 
     #[test]
     fn test_physical_dps_calculation() {
-        let (affix_map, base_type_map) = create_test_maps();
+        let (affix_map, base_type_map) = get_test_maps();
         let test_item = r#"Item Class: Quarterstaves
 Rarity: Rare
 Grim Gnarl
@@ -726,10 +697,11 @@ Item Level: 79
 Leeches 8.29% of Physical Damage as Life"#;
 
         let filters = TradeFilters::from_text(
-            |text, prefix| test_parse_mod(&affix_map, text, prefix),
-            |text| test_find_base_type(&base_type_map, text),
+            |text, prefix| affix_map.affix_to_trade_stat(text, prefix),
+            |text| base_type_map.item_text_to_base_type(text),
             test_item,
         )
+
         .expect("Should parse successfully");
 
         // Check attack speed

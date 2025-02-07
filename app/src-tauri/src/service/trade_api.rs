@@ -7,7 +7,7 @@ use crate::model::trade_result::TradeResult;
 pub async fn fetch_mappings(client: &Client) -> Result<(Value, Value), reqwest::Error> {
     async fn fetch_stats(client: &Client) -> Result<Value, reqwest::Error> {
         client
-            .get("https://www.pathofexile.com/api/trade/data/stats")
+            .get("https://www.pathofexile.com/api/trade2/data/stats")
             .send()
             .await?
             .json()
@@ -16,7 +16,7 @@ pub async fn fetch_mappings(client: &Client) -> Result<(Value, Value), reqwest::
 
     async fn fetch_items(client: &Client) -> Result<Value, reqwest::Error> {
         client
-            .get("https://www.pathofexile.com/api/trade/data/items")
+            .get("https://www.pathofexile.com/api/trade2/data/items")
             .send()
             .await?
             .json()
