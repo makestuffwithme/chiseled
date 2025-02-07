@@ -204,29 +204,28 @@ mod tests {
     fn test_deserialize_trade_result() {
         let json = r#"{
             "result": [{
-                "id": "1e1e45ea81d32638af21ccb285932c447a36942a653eb3973add1d7b2eeb57bf",
+                "id": "c1b3f708d968f0fa2c14a4d1cecb4f691fdd6f0bae623d3c9b10cc27d2480545",
                 "listing": {
                     "method": "psapi",
-                    "indexed": "2025-01-29T17:06:53Z",
-                    "stash": {
-                        "name": "弓",
-                        "x": 0,
-                        "y": 4
-                    },
-                    "whisper": "@无丶聊 你好，我想購買 巨獸 影弦 專家短弓 標價 1 transmute 在 Standard (倉庫頁 \"弓\"; 位置: 左 1, 上 5)",
+                    "indexed": "2025-02-07T02:26:42Z",
+                    "whisper": "@OverEpix_a Hi, I would like to buy your Kraken Thunder Advanced Zealot Bow listed for 1 regal in Standard (stash tab \"for sell\"; position: left 1, top 1)",
                     "account": {
-                        "name": "拾丶壹#4422",
+                        "name": "OverEpix#3364",
                         "online": {
                             "league": "Standard"
                         },
-                        "lastCharacterName": "无丶聊",
-                        "language": "zh_TW",
+                        "language": "en_US",
                         "realm": "poe2"
                     },
                     "price": {
                         "type": "~price",
-                        "amount": 1,
-                        "currency": "transmute"
+                        "amount": 1.0,
+                        "currency": "regal"
+                    },
+                    "stash": {
+                        "name": "for sell",
+                        "x": 0,
+                        "y": 0
                     }
                 },
                 "item": {
@@ -234,35 +233,33 @@ mod tests {
                     "verified": true,
                     "w": 2,
                     "h": 4,
-                    "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9Ud29IYW5kV2VhcG9ucy9Cb3dzL0Jhc2V0eXBlcy9Cb3cwMiIsInciOjIsImgiOjQsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/1ea0e1977e/Bow02.png",
+                    "icon": "https://web.poecdn.com/gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvV2VhcG9ucy9Ud29IYW5kV2VhcG9ucy9Cb3dzL0Jhc2V0eXBlcy9Cb3cwOCIsInciOjIsImgiOjQsInNjYWxlIjoxLCJyZWFsbSI6InBvZTIifV0/90f84002ea/Bow08.png",
                     "league": "Standard",
-                    "id": "1e1e45ea81d32638af21ccb285932c447a36942a653eb3973add1d7b2eeb57bf",
-                    "sockets": [
-                        {
-                            "group": 0,
-                            "type": "rune"
-                        },
-                        {
-                            "group": 1,
-                            "type": "rune"
-                        }
-                    ],
-                    "name": "Behemoth Nock",
-                    "typeLine": "Expert Shortbow",
-                    "baseType": "Expert Shortbow",
+                    "id": "c1b3f708d968f0fa2c14a4d1cecb4f691fdd6f0bae623d3c9b10cc27d2480545",
+                    "sockets": null,
+                    "name": "Kraken Thunder",
+                    "typeLine": "Advanced Zealot Bow",
+                    "baseType": "Advanced Zealot Bow",
                     "rarity": "Rare",
-                    "ilvl": 67,
+                    "ilvl": 65,
                     "identified": true,
-                    "note": "~price 1 transmute",
+                    "corrupted": null,
+                    "note": "~price 1 regal",
                     "properties": [
                         {
                             "name": "[Bow]",
                             "values": [],
-                            "displayMode": 0
+                            "displayMode": 0,
+                            "type": null
                         },
                         {
                             "name": "[Physical] Damage",
-                            "values": [["57-101", 1]],
+                            "values": [
+                                [
+                                    "72-113",
+                                    1
+                                ]
+                            ],
                             "displayMode": 0,
                             "type": 9
                         },
@@ -270,7 +267,7 @@ mod tests {
                             "name": "Fire Damage",
                             "values": [
                                 [
-                                    "51-62",
+                                    "26-47",
                                     4
                                 ]
                             ],
@@ -292,8 +289,8 @@ mod tests {
                             "name": "Attacks per Second",
                             "values": [
                                 [
-                                    "1.49",
-                                    1
+                                    "1.20",
+                                    0
                                 ]
                             ],
                             "displayMode": 0,
@@ -303,7 +300,12 @@ mod tests {
                     "requirements": [
                         {
                             "name": "Level",
-                            "values": [["67", 0]],
+                            "values": [
+                                [
+                                    "62",
+                                    0
+                                ]
+                            ],
                             "displayMode": 0,
                             "type": 62
                         },
@@ -311,7 +313,7 @@ mod tests {
                             "name": "[Dexterity|Dex]",
                             "values": [
                                 [
-                                    "147",
+                                    "106",
                                     1
                                 ]
                             ],
@@ -319,90 +321,111 @@ mod tests {
                             "type": 64
                         }
                     ],
+                    "implicitMods": null,
                     "explicitMods": [
-                        "Adds 16 to 25 [Physical|Physical] Damage",
-                        "Adds 51 to 62 [Fire|Fire] Damage",
-                        "19% increased [Attack] Speed",
-                        "15% reduced [Attributes|Attribute] Requirements",
-                        "Grants 4 Life per Enemy [HitDamage|Hit]"
+                        "28% increased [Physical] Damage",
+                        "Adds 10 to 19 [Physical|Physical] Damage",
+                        "Adds 26 to 47 [Fire|Fire] Damage",
+                        "+54 to [Accuracy|Accuracy] Rating",
+                        "25% reduced [Attributes|Attribute] Requirements",
+                        "Bow [Attack|Attacks] fire an additional Arrow",
+                        "[ManaLeech|Leeches] 6.28% of [Physical|Physical] Damage as Mana"
                     ],
+                    "runeMods": null,
                     "frameType": 2,
-                    "socketedItems": [],
+                    "socketedItems": null,
                     "extended": {
-                        "dps": 224.99,
-                        "pdps": 140.81,
-                        "edps": 84.19,
+                        "dps": 176.4,
+                        "pdps": 132.6,
+                        "edps": 43.8,
                         "dps_aug": true,
                         "pdps_aug": true,
                         "mods": {
                             "explicit": [
                                 {
-                                    "name": "of the Worthy",
-                                    "tier": "S1",
-                                    "level": 24,
+                                    "name": "Reaver's",
+                                    "tier": "P3",
+                                    "level": 23,
+                                    "magnitudes": [
+                                        {
+                                            "hash": "explicit.stat_1509134228",
+                                            "min": "25",
+                                            "max": "34"
+                                        },
+                                        {
+                                            "hash": "explicit.stat_691932474",
+                                            "min": "47",
+                                            "max": "72"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "Incinerating",
+                                    "tier": "P7",
+                                    "level": 51,
+                                    "magnitudes": [
+                                        {
+                                            "hash": "explicit.stat_709508406",
+                                            "min": "26",
+                                            "max": "39"
+                                        },
+                                        {
+                                            "hash": "explicit.stat_709508406",
+                                            "min": "40",
+                                            "max": "59"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "name": "of the Talented",
+                                    "tier": "S3",
+                                    "level": 40,
                                     "magnitudes": [
                                         {
                                             "hash": "explicit.stat_3639275092",
-                                            "min": "-15",
-                                            "max": "-15"
+                                            "min": "-25",
+                                            "max": "-25"
                                         }
                                     ]
                                 },
                                 {
-                                    "name": "Blasting",
-                                    "tier": "P8",
-                                    "level": 62,
+                                    "name": "Honed",
+                                    "tier": "P4",
+                                    "level": 29,
                                     "magnitudes": [
                                         {
-                                            "hash": "explicit.stat_709508406",
-                                            "min": "35",
-                                            "max": "52"
+                                            "hash": "explicit.stat_1940865751",
+                                            "min": "8",
+                                            "max": "12"
                                         },
                                         {
-                                            "hash": "explicit.stat_709508406",
-                                            "min": "53",
-                                            "max": "79"
+                                            "hash": "explicit.stat_1940865751",
+                                            "min": "14",
+                                            "max": "21"
                                         }
                                     ]
                                 },
                                 {
-                                    "name": "of Acclaim",
-                                    "tier": "S5",
-                                    "level": 37,
+                                    "name": "of Splintering",
+                                    "tier": "S1",
+                                    "level": 55,
                                     "magnitudes": [
                                         {
-                                            "hash": "explicit.stat_210067635",
-                                            "min": "17",
-                                            "max": "19"
+                                            "hash": "explicit.stat_3885405204",
+                                            "min": "1",
+                                            "max": "1"
                                         }
                                     ]
                                 },
                                 {
-                                    "name": "of Regrowth",
+                                    "name": "of the Arid",
                                     "tier": "S3",
-                                    "level": 30,
+                                    "level": 54,
                                     "magnitudes": [
                                         {
-                                            "hash": "explicit.stat_821021828",
-                                            "min": "4",
-                                            "max": "4"
-                                        }
-                                    ]
-                                },
-                                {
-                                    "name": "Annealed",
-                                    "tier": "P6",
-                                    "level": 46,
-                                    "magnitudes": [
-                                        {
-                                            "hash": "explicit.stat_1940865751",
-                                            "min": "13",
-                                            "max": "20"
-                                        },
-                                        {
-                                            "hash": "explicit.stat_1940865751",
-                                            "min": "23",
-                                            "max": "35"
+                                            "hash": "explicit.stat_669069897",
+                                            "min": "6",
+                                            "max": "6.9"
                                         }
                                     ]
                                 }
@@ -411,9 +434,15 @@ mod tests {
                         "hashes": {
                             "explicit": [
                                 [
+                                    "explicit.stat_1509134228",
+                                    [
+                                        0
+                                    ]
+                                ],
+                                [
                                     "explicit.stat_1940865751",
                                     [
-                                        4
+                                        3
                                     ]
                                 ],
                                 [
@@ -423,21 +452,27 @@ mod tests {
                                     ]
                                 ],
                                 [
-                                    "explicit.stat_210067635",
-                                    [
-                                        2
-                                    ]
-                                ],
-                                [
-                                    "explicit.stat_3639275092",
+                                    "explicit.stat_691932474",
                                     [
                                         0
                                     ]
                                 ],
                                 [
-                                    "explicit.stat_821021828",
+                                    "explicit.stat_3639275092",
                                     [
-                                        3
+                                        2
+                                    ]
+                                ],
+                                [
+                                    "explicit.stat_3885405204",
+                                    [
+                                        4
+                                    ]
+                                ],
+                                [
+                                    "explicit.stat_669069897",
+                                    [
+                                        5
                                     ]
                                 ]
                             ]
@@ -459,29 +494,29 @@ mod tests {
         // Verify listing info
         assert_eq!(
             item.id,
-            "1e1e45ea81d32638af21ccb285932c447a36942a653eb3973add1d7b2eeb57bf"
+            "c1b3f708d968f0fa2c14a4d1cecb4f691fdd6f0bae623d3c9b10cc27d2480545"
         );
         assert_eq!(item.listing.method, "psapi");
-        assert_eq!(item.listing.indexed, "2025-01-29T17:06:53Z");
+        assert_eq!(item.listing.indexed, "2025-02-07T02:26:42Z");
 
         // Verify stash info
         let stash = item.listing.stash.as_ref().unwrap();
-        assert_eq!(stash.name, "弓");
+        assert_eq!(stash.name, "for sell");
         assert_eq!(stash.x, 0);
-        assert_eq!(stash.y, 4);
+        assert_eq!(stash.y, 0);
 
         // Verify account info
-        assert_eq!(item.listing.account.name, "拾丶壹#4422");
+        assert_eq!(item.listing.account.name, "OverEpix#3364");
         let online = item.listing.account.online.as_ref().unwrap();
         assert_eq!(online.league, "Standard");
-        assert_eq!(item.listing.account.language.as_ref().unwrap(), "zh_TW");
+        assert_eq!(item.listing.account.language.as_ref().unwrap(), "en_US");
         assert_eq!(item.listing.account.realm.as_ref().unwrap(), "poe2");
 
         // Verify price info
         let price = item.listing.price.as_ref().unwrap();
         assert_eq!(price.price_type, "~price");
         assert_eq!(price.amount, 1.0);
-        assert_eq!(price.currency, "transmute");
+        assert_eq!(price.currency, "regal");
 
         // Verify whisper
         assert!(item.listing.whisper.as_ref().unwrap().contains("@无丶聊"));
@@ -494,14 +529,14 @@ mod tests {
         assert_eq!(item_info.h, 4);
         assert!(item_info.icon.contains("Bow02.png"));
         assert_eq!(item_info.league, "Standard");
-        assert_eq!(item_info.name, "Behemoth Nock");
-        assert_eq!(item_info.type_line, "Expert Shortbow");
-        assert_eq!(item_info.base_type, "Expert Shortbow");
+        assert_eq!(item_info.name, "Kraken Thunder");
+        assert_eq!(item_info.type_line, "Advanced Zealot Bow");
+        assert_eq!(item_info.base_type, "Advanced Zealot Bow");
         assert_eq!(item_info.rarity, "Rare");
-        assert_eq!(item_info.ilvl, 67);
+        assert_eq!(item_info.ilvl, 65);
         assert!(item_info.identified);
         assert_eq!(item_info.frame_type, 2);
-        assert_eq!(item_info.note.as_ref().unwrap(), "~price 1 transmute");
+        assert_eq!(item_info.note.as_ref().unwrap(), "~price 1 regal");
 
         // Verify sockets
         let sockets = item_info.sockets.as_ref().unwrap();
@@ -519,13 +554,13 @@ mod tests {
         assert_eq!(properties[0].display_mode, 0);
 
         assert_eq!(properties[1].name, "[Physical] Damage");
-        assert_eq!(properties[1].values[0].0, "57-101");
+        assert_eq!(properties[1].values[0].0, "72-113");
         assert_eq!(properties[1].values[0].1, 1);
         assert_eq!(properties[1].display_mode, 0);
         assert_eq!(properties[1].property_type.unwrap(), 9);
 
         assert_eq!(properties[2].name, "Fire Damage");
-        assert_eq!(properties[2].values[0].0, "51-62");
+        assert_eq!(properties[2].values[0].0, "26-47");
         assert_eq!(properties[2].values[0].1, 4);
         assert_eq!(properties[2].display_mode, 0);
         assert_eq!(properties[2].property_type.unwrap(), 10);
@@ -537,8 +572,8 @@ mod tests {
         assert_eq!(properties[3].property_type.unwrap(), 12);
 
         assert_eq!(properties[4].name, "Attacks per Second");
-        assert_eq!(properties[4].values[0].0, "1.49");
-        assert_eq!(properties[4].values[0].1, 1);
+        assert_eq!(properties[4].values[0].0, "1.20");
+        assert_eq!(properties[4].values[0].1, 0);
         assert_eq!(properties[4].display_mode, 0);
         assert_eq!(properties[4].property_type.unwrap(), 13);
 
@@ -546,66 +581,39 @@ mod tests {
         let requirements = item_info.requirements.as_ref().unwrap();
         assert_eq!(requirements.len(), 2);
         assert_eq!(requirements[0].name, "Level");
-        assert_eq!(requirements[0].values[0].0, "67");
+        assert_eq!(requirements[0].values[0].0, "62");
         assert_eq!(requirements[0].values[0].1, 0);
         assert_eq!(requirements[0].display_mode, 0);
         assert_eq!(requirements[0].requirement_type.unwrap(), 62);
 
         assert_eq!(requirements[1].name, "[Dexterity|Dex]");
-        assert_eq!(requirements[1].values[0].0, "147");
+        assert_eq!(requirements[1].values[0].0, "106");
         assert_eq!(requirements[1].values[0].1, 1);
         assert_eq!(requirements[1].display_mode, 1);
         assert_eq!(requirements[1].requirement_type.unwrap(), 64);
 
         // Verify mods
-        let explicit_mods = item_info.explicit_mods.as_ref().unwrap();
-        assert_eq!(explicit_mods.len(), 5);
-        assert_eq!(explicit_mods[0], "Adds 16 to 25 [Physical|Physical] Damage");
-        assert_eq!(explicit_mods[1], "Adds 51 to 62 [Fire|Fire] Damage");
-        assert_eq!(explicit_mods[2], "19% increased [Attack] Speed");
-        assert_eq!(
-            explicit_mods[3],
-            "15% reduced [Attributes|Attribute] Requirements"
-        );
-        assert_eq!(explicit_mods[4], "Grants 4 Life per Enemy [HitDamage|Hit]");
+        let mods = item_info.extended.as_ref().unwrap().mods.as_ref().unwrap();
+        let explicit_mods = mods.explicit.as_ref().unwrap();
+        assert_eq!(explicit_mods.len(), 6);
 
-        // Verify extended info
-        let extended = item_info.extended.as_ref().unwrap();
-        assert_eq!(extended.dps.unwrap(), 224.99);
-        assert_eq!(extended.pdps.unwrap(), 140.81);
-        assert_eq!(extended.edps.unwrap(), 84.19);
-        assert!(extended.dps_augmented.unwrap());
-        assert!(extended.pdps_augmented.unwrap());
+        // Verify first mod (Reaver's - grants both phys damage and accuracy)
+        assert_eq!(explicit_mods[0].name, "Reaver's");
+        assert_eq!(explicit_mods[0].tier, "P3");
+        assert_eq!(explicit_mods[0].level, 23);
+        assert_eq!(explicit_mods[0].magnitudes.len(), 2);
 
-        // Verify mod details
-        let mods = extended.mods.as_ref().unwrap();
-        assert_eq!(mods.explicit.as_ref().unwrap().len(), 5);
+        // Verify hash mapping
+        let hashes = item_info.extended.as_ref().unwrap().hashes.as_ref().unwrap();
+        let explicit_hashes = hashes.explicit.as_ref().unwrap();
+        assert_eq!(explicit_hashes.len(), 7);
 
-        let explicit_mod = &mods.explicit.as_ref().unwrap()[0];
-        assert_eq!(explicit_mod.name, "of the Worthy");
-        assert_eq!(explicit_mod.tier, "S1");
-        assert_eq!(explicit_mod.level, 24);
-        assert_eq!(explicit_mod.magnitudes[0].hash, "explicit.stat_3639275092");
-        assert_eq!(explicit_mod.magnitudes[0].min, "-15");
-        assert_eq!(explicit_mod.magnitudes[0].max, "-15");
+        // Verify first hash mapping (phys damage from Reaver's)
+        assert_eq!(explicit_hashes[0].0, "explicit.stat_1509134228");
+        assert_eq!(explicit_hashes[0].1, vec![0]);
 
-        // Verify all explicit mods
-        assert_eq!(mods.explicit.as_ref().unwrap()[1].name, "Blasting");
-        assert_eq!(mods.explicit.as_ref().unwrap()[1].tier, "P8");
-        assert_eq!(mods.explicit.as_ref().unwrap()[2].name, "of Acclaim");
-        assert_eq!(mods.explicit.as_ref().unwrap()[2].tier, "S5");
-        assert_eq!(mods.explicit.as_ref().unwrap()[3].name, "of Regrowth");
-        assert_eq!(mods.explicit.as_ref().unwrap()[3].tier, "S3");
-        assert_eq!(mods.explicit.as_ref().unwrap()[4].name, "Annealed");
-        assert_eq!(mods.explicit.as_ref().unwrap()[4].tier, "P6");
-
-        // Verify hashes
-        let hashes = extended.hashes.as_ref().unwrap();
-        assert_eq!(hashes.explicit.as_ref().unwrap().len(), 5);
-        assert_eq!(
-            hashes.explicit.as_ref().unwrap()[0].0,
-            "explicit.stat_1940865751"
-        );
-        assert_eq!(hashes.explicit.as_ref().unwrap()[0].1[0], 4);
+        // Verify second hash mapping (flat phys from Honed)
+        assert_eq!(explicit_hashes[1].0, "explicit.stat_1940865751");
+        assert_eq!(explicit_hashes[1].1, vec![3]);
     }
 }

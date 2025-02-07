@@ -72,6 +72,9 @@
 						}[];
 					}[];
 				};
+				hashes?: {
+					explicit?: [string, number[]][];
+				};
 			};
 		};
 	}[] = [];
@@ -286,10 +289,13 @@
 								<div class="border-t border-border py-1">
 									{#each result.item.explicitMods as mod, i}
 										<div class="text-text flex items-baseline gap-2">
-											{#if result.item.extended?.mods?.explicit?.[i]}
-												<span class="text-xs text-text-muted">
-													{formatModTier(result.item.extended.mods.explicit[i].tier)}
-												</span>
+											{#if result.item.extended?.mods?.explicit && result.item.extended?.hashes?.explicit}
+												{@const modDetails = result.item.extended.mods.explicit[result.item.extended.hashes.explicit[i][1][0]]}
+												{#if modDetails}
+													<span class="text-xs text-text-muted">
+														{formatModTier(modDetails.tier)}
+													</span>
+												{/if}
 											{/if}
 											<span>{formatBracketedText(mod)}</span>
 										</div>
