@@ -162,40 +162,57 @@ impl TradeFilters {
             return Err("Invalid item format: header should be 3 or 4 lines".to_string());
         }
 
-        // Parse item class
-        if let Some(class) = header_lines[0].strip_prefix("Item Class: ") {
-            filters.item_category = Some(TextFilter {
-                text: Self::map_item_category(class).to_string(),
-                enabled: true,
-            });
-        }
-
         // Parse rarity
-        if let Some(rarity) = header_lines[1].strip_prefix("Rarity: ") {
-            filters.rarity = Some(TextFilter {
-                text: rarity.to_string(),
-                enabled: true,
-            });
-        }
-
-        // Parse item name and base type
-        filters.item_name = Some(TextFilter {
-            text: header_lines[2].to_string(),
+        let rarity = header_lines[1]
+            .strip_prefix("Rarity: ")
+            .ok_or("Missing rarity")?;
+        filters.rarity = Some(TextFilter {
+            text: rarity.to_string(),
             enabled: true,
         });
 
-        if header_lines.len() == 4 {
-            // 4-line header with explicit base type
-            filters.item_base_type = Some(TextFilter {
-                text: header_lines[3].to_string(),
-                enabled: true,
-            });
-        } else if let Some((base_type, _)) = find_base_type(text) {
-            // 3-line header, find base type from name
-            filters.item_base_type = Some(TextFilter {
-                text: base_type,
-                enabled: true,
-            });
+        // Parse item category
+        if let Some(class) = header_lines[0].strip_prefix("Item Class: ") {
+            if rarity != "Unique" {
+                filters.item_category = Some(TextFilter {
+                    text: Self::map_item_category(class).to_string(),
+                    enabled: true,
+                });
+            }
+
+        }
+
+        // Parse item name and base type based on rarity
+        match rarity {
+            "Unique" => {
+                // For unique items, we care about the name but not the base type or category
+                filters.item_name = Some(TextFilter {
+                    text: header_lines[2].to_string(),
+                    enabled: true,
+                });
+            }
+            "Rare" | "Magic" | "Normal" => {
+                // For non-unique items, we care about the base type but not the name
+                if rarity != "Rare" {
+                    filters.item_name = Some(TextFilter {
+                        text: header_lines[2].to_string(),
+                        enabled: true,
+                    });
+                }
+
+                if header_lines.len() == 4 {
+                    filters.item_base_type = Some(TextFilter {
+                        text: header_lines[3].to_string(),
+                        enabled: true,
+                    });
+                } else if let Some((base_type, _)) = find_base_type(text) {
+                    filters.item_base_type = Some(TextFilter {
+                        text: base_type,
+                        enabled: true,
+                    });
+                }
+            }
+            _ => return Err(format!("Unsupported rarity: {}", rarity)),
         }
 
         // Process body lines

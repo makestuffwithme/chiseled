@@ -45,6 +45,8 @@
 
 	interface TradeFilters {
 		item_category: TextFilter | null;
+		item_name: TextFilter | null;
+		item_base_type: TextFilter | null;
 		rarity: TextFilter | null;
 		item_level: RangeFilter | null;
 		physical_dps: RangeFilter | null;
@@ -158,25 +160,92 @@
 							filter={filters.item_category}
 							label="Item Category"
 							options={[
-								// Weapons
+								// One-Handed Weapons
+								{ value: 'weapon.claw', label: 'Claw' },
+								{ value: 'weapon.dagger', label: 'Dagger' },
+								{ value: 'weapon.onesword', label: 'One-Handed Sword' },
+								{ value: 'weapon.oneaxe', label: 'One-Handed Axe' },
+								{ value: 'weapon.onemace', label: 'One-Handed Mace' },
+								{ value: 'weapon.spear', label: 'Spear' },
+								{ value: 'weapon.flail', label: 'Flail' },
+
+								// Two-Handed Weapons
+								{ value: 'weapon.twosword', label: 'Two-Handed Sword' },
+								{ value: 'weapon.twoaxe', label: 'Two-Handed Axe' },
+								{ value: 'weapon.twomace', label: 'Two-Handed Mace' },
+								{ value: 'weapon.warstaff', label: 'Quarterstaff' },
+
+								// Ranged Weapons
 								{ value: 'weapon.bow', label: 'Bow' },
 								{ value: 'weapon.crossbow', label: 'Crossbow' },
-								{ value: 'weapon.staff', label: 'Staff' },
-								{ value: 'weapon.warstaff', label: 'Quarterstaff/Warstaff' },
+
+								// Caster Weapons
 								{ value: 'weapon.wand', label: 'Wand' },
+								{ value: 'weapon.sceptre', label: 'Sceptre' },
+								{ value: 'weapon.staff', label: 'Staff' },
 
 								// Armour
-								{ value: 'armour.chest', label: 'Body Armour' },
-								{ value: 'armour.boots', label: 'Boots' },
-								{ value: 'armour.gloves', label: 'Gloves' },
 								{ value: 'armour.helmet', label: 'Helmet' },
+								{ value: 'armour.chest', label: 'Body Armour' },
+								{ value: 'armour.gloves', label: 'Gloves' },
+								{ value: 'armour.boots', label: 'Boots' },
+								{ value: 'armour.quiver', label: 'Quiver' },
 								{ value: 'armour.shield', label: 'Shield' },
+								{ value: 'armour.focus', label: 'Focus' },
+								{ value: 'armour.buckler', label: 'Buckler' },
 
 								// Accessories
 								{ value: 'accessory.amulet', label: 'Amulet' },
+								{ value: 'accessory.belt', label: 'Belt' },
 								{ value: 'accessory.ring', label: 'Ring' },
-								{ value: 'accessory.belt', label: 'Belt' }
+
+								// Gems
+								{ value: 'gem', label: 'Any Gem' },
+								{ value: 'gem.activegem', label: 'Skill Gem' },
+								{ value: 'gem.supportgem', label: 'Support Gem' },
+								{ value: 'gem.metagem', label: 'Meta Gem' },
+
+								// Flasks
+								{ value: 'flask', label: 'Any Flask' },
+								{ value: 'flask.life', label: 'Life Flask' },
+								{ value: 'flask.mana', label: 'Mana Flask' },
+
+								// Endgame Items
+								{ value: 'map.waystone', label: 'Waystone' },
+								{ value: 'map.fragment', label: 'Map Fragment' },
+								{ value: 'map.logbook', label: 'Logbook' },
+								{ value: 'map.breachstone', label: 'Breachstone' },
+								{ value: 'map.barya', label: 'Barya' },
+								{ value: 'map.bosskey', label: 'Pinnacle Key' },
+								{ value: 'map.ultimatum', label: 'Ultimatum Key' },
+								{ value: 'map.tablet', label: 'Tablet' },
+
+								// Misc Items
+								{ value: 'card', label: 'Divination Card' },
+								{ value: 'sanctum.relic', label: 'Relic' },
+
+								{ value: 'currency.omen', label: 'Omen' },
+								{ value: 'currency.rune', label: 'Rune' },
+								{ value: 'currency.soulcore', label: 'Soul Core' }
 							]}
+						/>
+					{/if}
+
+					<!-- Item Name -->
+					{#if filters.item_name}
+						<TextFilterInput
+							filter={filters.item_name}
+							label="Item Name"
+							readonly={true}
+						/>
+					{/if}
+
+					<!-- Base Type -->
+					{#if filters.item_base_type}
+						<TextFilterInput
+							filter={filters.item_base_type}
+							label="Base Type"
+							readonly={true}
 						/>
 					{/if}
 

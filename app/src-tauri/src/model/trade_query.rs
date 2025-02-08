@@ -101,20 +101,40 @@ impl TradeQuery {
                 "type": "and",
                 "filters": stat_filters,
                 "disabled": false
-            }],
-            "filters": {
-                "type_filters": {
-                    "filters": {
-                        "category": {
-                            "option": filters.item_category.as_ref()
-                                .map(|c| c.text.to_lowercase())
-                                .unwrap_or_default()
-                        }
-                    },
-                    "disabled": !filters.item_category.as_ref().map_or(false, |c| c.enabled)
-                }
-            }
+            }]
         });
+
+        // Only add type filters if we have an enabled category
+        if filters.item_category.as_ref().map_or(false, |c| c.enabled) {
+            query["filters"]["type_filters"] = json!({
+                "filters": {
+                    "category": {
+                        "option": filters.item_category.as_ref()
+                            .map(|c| c.text.to_lowercase())
+                            .unwrap_or_default()
+                    }
+                },
+                "disabled": false
+            });
+        }
+
+        // Add name filter if enabled (for unique items)
+        if let Some(name) = &filters.item_name {
+            if name.enabled {
+                query["query"] = json!({
+                    "name": name.text,
+                    "type": filters.item_base_type.as_ref().map(|t| t.text.clone()).unwrap_or_default()
+                });
+            }
+        }
+        // Add type filter if enabled (for non-unique items)
+        else if let Some(base_type) = &filters.item_base_type {
+            if base_type.enabled {
+                query["query"] = json!({
+                    "type": base_type.text
+                });
+            }
+        }
 
         // Add item level filter if present and enabled
         if let Some(ilvl) = &filters.item_level {

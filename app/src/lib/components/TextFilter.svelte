@@ -7,12 +7,18 @@
 	};
 	export let label: string;
 	export let options: { value: string; label: string }[] | undefined = undefined;
+	export let readonly = false;
+
+	function updateFilter(newValue: string) {
+		filter.text = newValue;
+		filter = filter;
+	}
 </script>
 
-<FilterRow enabled={filter.enabled} {label} onToggle={(checked) => (filter.enabled = checked)}>
+<FilterRow enabled={filter.enabled} {label} onToggle={(value) => (filter.enabled = value)}>
 	{#if options}
 		<select
-			class="p-0.5 bg-surface-dark border-border border rounded text-text disabled:opacity-50"
+			class="p-0 bg-surface-dark border-border border rounded text-text disabled:opacity-50"
 			bind:value={filter.text}
 			disabled={!filter.enabled}
 		>
@@ -23,9 +29,10 @@
 	{:else}
 		<input
 			type="text"
-			class="p-0.5 bg-surface-dark border-border border rounded text-text placeholder-text-muted disabled:opacity-50"
-			bind:value={filter.text}
-			disabled={!filter.enabled}
+			class="p-0 px-1 bg-surface-dark border-border border rounded text-text disabled:opacity-50"
+			value={filter.text}
+			on:input={(e) => updateFilter(e.currentTarget.value)}
+			disabled={!filter.enabled || readonly}
 		/>
 	{/if}
 </FilterRow>
