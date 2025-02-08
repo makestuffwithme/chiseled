@@ -30,9 +30,9 @@ pub struct ItemInfo {
     pub type_line: String,
     #[serde(rename = "baseType")]
     pub base_type: String,
-    pub rarity: String,
-    pub ilvl: i32,
-    pub identified: bool,
+    pub rarity: Option<String>,
+    pub ilvl: Option<i32>,
+    pub identified: Option<bool>,
     pub corrupted: Option<bool>,
     pub note: Option<String>,
     pub properties: Option<Vec<ItemProperty>>,
@@ -47,7 +47,21 @@ pub struct ItemInfo {
     pub frame_type: i32,
     #[serde(rename = "socketedItems")]
     pub socketed_items: Option<Vec<SocketedItem>>,
-    pub extended: Option<ItemExtendedInfo>,
+    #[serde(default)]
+    pub extended: ExtendedInfo,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ExtendedInfo {
+    Full(ItemExtendedInfo),
+    Empty(Vec<String>),
+}
+
+impl Default for ExtendedInfo {
+    fn default() -> Self {
+        ExtendedInfo::Empty(vec![])
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -527,14 +541,14 @@ mod tests {
         assert!(item_info.verified);
         assert_eq!(item_info.w, 2);
         assert_eq!(item_info.h, 4);
-        assert!(item_info.icon.contains("Bow02.png"));
+        assert!(item_info.icon.contains("Bow08.png"));
         assert_eq!(item_info.league, "Standard");
         assert_eq!(item_info.name, "Kraken Thunder");
         assert_eq!(item_info.type_line, "Advanced Zealot Bow");
         assert_eq!(item_info.base_type, "Advanced Zealot Bow");
-        assert_eq!(item_info.rarity, "Rare");
-        assert_eq!(item_info.ilvl, 65);
-        assert!(item_info.identified);
+        assert_eq!(item_info.rarity, Some("Rare".to_string()));
+        assert_eq!(item_info.ilvl, Some(65));
+        assert_eq!(item_info.identified, Some(true));
         assert_eq!(item_info.frame_type, 2);
         assert_eq!(item_info.note.as_ref().unwrap(), "~price 1 regal");
 
@@ -593,27 +607,31 @@ mod tests {
         assert_eq!(requirements[1].requirement_type.unwrap(), 64);
 
         // Verify mods
-        let mods = item_info.extended.as_ref().unwrap().mods.as_ref().unwrap();
-        let explicit_mods = mods.explicit.as_ref().unwrap();
-        assert_eq!(explicit_mods.len(), 6);
+        if let ExtendedInfo::Full(extended) = &item_info.extended {
+            let mods = extended.mods.as_ref().unwrap();
+            let explicit_mods = mods.explicit.as_ref().unwrap();
+            assert_eq!(explicit_mods.len(), 6);
 
-        // Verify first mod (Reaver's - grants both phys damage and accuracy)
-        assert_eq!(explicit_mods[0].name, "Reaver's");
-        assert_eq!(explicit_mods[0].tier, "P3");
-        assert_eq!(explicit_mods[0].level, 23);
-        assert_eq!(explicit_mods[0].magnitudes.len(), 2);
+            // Verify first mod (Reaver's - grants both phys damage and accuracy)
+            assert_eq!(explicit_mods[0].name, "Reaver's");
+            assert_eq!(explicit_mods[0].tier, "P3");
+            assert_eq!(explicit_mods[0].level, 23);
+            assert_eq!(explicit_mods[0].magnitudes.len(), 2);
 
-        // Verify hash mapping
-        let hashes = item_info.extended.as_ref().unwrap().hashes.as_ref().unwrap();
-        let explicit_hashes = hashes.explicit.as_ref().unwrap();
-        assert_eq!(explicit_hashes.len(), 7);
+            // Verify hash mapping
+            let hashes = extended.hashes.as_ref().unwrap();
+            let explicit_hashes = hashes.explicit.as_ref().unwrap();
+            assert_eq!(explicit_hashes.len(), 7);
 
-        // Verify first hash mapping (phys damage from Reaver's)
-        assert_eq!(explicit_hashes[0].0, "explicit.stat_1509134228");
-        assert_eq!(explicit_hashes[0].1, vec![0]);
+            // Verify first hash mapping (phys damage from Reaver's)
+            assert_eq!(explicit_hashes[0].0, "explicit.stat_1509134228");
+            assert_eq!(explicit_hashes[0].1, vec![0]);
 
-        // Verify second hash mapping (flat phys from Honed)
-        assert_eq!(explicit_hashes[1].0, "explicit.stat_1940865751");
-        assert_eq!(explicit_hashes[1].1, vec![3]);
+            // Verify second hash mapping (flat phys from Honed)
+            assert_eq!(explicit_hashes[1].0, "explicit.stat_1940865751");
+            assert_eq!(explicit_hashes[1].1, vec![3]);
+        } else {
+            panic!("Expected ExtendedInfo::Full variant");
+        }
     }
 }

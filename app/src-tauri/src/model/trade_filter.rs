@@ -82,29 +82,74 @@ impl TradeFilters {
     fn map_item_category(item_class: &str) -> String {
         let item_text = item_class.to_lowercase();
         match item_text.as_str() {
-            // Weapons
-            "crossbows" => "weapon.crossbow",
+            // One-Handed Weapons
+            "claws" => "weapon.claw",
+            "daggers" => "weapon.dagger",
+            "one hand swords" => "weapon.onesword",
+            "one hand axes" => "weapon.oneaxe",
+            "one hand maces" => "weapon.onemace",
+            "spears" => "weapon.spear",
+            "flails" => "weapon.flail",
+
+            // Two-Handed Weapons
+            "two hand swords" => "weapon.twosword",
+            "two hand axes" => "weapon.twoaxe",
+            "two hand maces" => "weapon.twomace",
             "quarterstaves" => "weapon.warstaff",
+
+            // Ranged Weapons
             "bows" => "weapon.bow",
-            "staves" => "weapon.staff",
+            "crossbows" => "weapon.crossbow",
+
+            // Caster Weapons
             "wands" => "weapon.wand",
+            "sceptres" => "weapon.sceptre",
+            "staves" => "weapon.staff",
 
             // Armour
-            "body armours" => "armour.chest",
-            "boots" => "armour.boots",
-            "gloves" => "armour.gloves",
             "helmets" => "armour.helmet",
+            "body armours" => "armour.chest",
+            "gloves" => "armour.gloves",
+            "boots" => "armour.boots",
+            "quivers" => "armour.quiver",
             "shields" => "armour.shield",
+            "focuses" => "armour.focus",
+            "bucklers" => "armour.buckler",
 
             // Accessories
             "amulets" => "accessory.amulet",
-            "rings" => "accessory.ring",
             "belts" => "accessory.belt",
+            "rings" => "accessory.ring",
 
-            // Currency
-            "currency" => "currency",
+            // Gems
+            "active skill gems" => "gem.activegem",
+            "support skill gems" => "gem.supportgem",
+            "meta skill gems" => "gem.metagem",
+            "skill gems" => "gem",
 
-            // Other categories can be added as needed
+            // Flasks
+            "life flasks" => "flask.life",
+            "mana flasks" => "flask.mana",
+            "flasks" => "flask",
+
+            // Endgame Items
+            "waystones" => "map.waystone",
+            "map fragments" => "map.fragment",
+            "logbooks" => "map.logbook",
+            "breachstones" => "map.breachstone",
+            "baryas" => "map.barya",
+            "pinnacle keys" => "map.bosskey",
+            "ultimatum keys" => "map.ultimatum",
+            "tablets" => "map.tablet",
+
+            // Misc Items
+            "divination cards" => "card",
+            "relics" => "sanctum.relic",
+            "omens" => "currency.omen",
+            "runes" => "currency.rune",
+            "soul cores" => "currency.soulcore",
+
+            // Default case
             _ => item_text.as_str(),
         }
         .to_string()
@@ -171,19 +216,14 @@ impl TradeFilters {
             enabled: true,
         });
 
-        // Parse item category
-        if let Some(class) = header_lines[0].strip_prefix("Item Class: ") {
-            if rarity != "Unique" {
-                filters.item_category = Some(TextFilter {
-                    text: Self::map_item_category(class).to_string(),
+        // Parse item name and base type based on rarity
+        match rarity {
+            "Currency" => {
+                filters.item_base_type = Some(TextFilter {
+                    text: header_lines[2].to_string(),
                     enabled: true,
                 });
             }
-
-        }
-
-        // Parse item name and base type based on rarity
-        match rarity {
             "Unique" => {
                 // For unique items, we care about the name but not the base type or category
                 filters.item_name = Some(TextFilter {
@@ -192,10 +232,10 @@ impl TradeFilters {
                 });
             }
             "Rare" | "Magic" | "Normal" => {
-                // For non-unique items, we care about the base type but not the name
-                if rarity != "Rare" {
-                    filters.item_name = Some(TextFilter {
-                        text: header_lines[2].to_string(),
+                // Parse item category
+                if let Some(class) = header_lines[0].strip_prefix("Item Class: ") {
+                    filters.item_category = Some(TextFilter {
+                        text: Self::map_item_category(class).to_string(),
                         enabled: true,
                     });
                 }

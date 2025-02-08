@@ -75,7 +75,6 @@
 		const filterGroups = document.querySelectorAll('.filter-group-checkbox') as NodeListOf<HTMLInputElement>;
 		filterGroups.forEach(checkbox => {
 			checkbox.checked = true;
-			checkbox.dispatchEvent(new Event('change'));
 		});
 	}
 

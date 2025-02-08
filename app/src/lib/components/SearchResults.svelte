@@ -19,11 +19,13 @@
 			name: string;
 			baseType: string;
 			typeLine: string;
-			ilvl: number;
-			rarity: string;
+			ilvl?: number;
+			identified?: boolean;
+			rarity?: string;
 			frameType: number;
 			icon: string;
 			corrupted?: boolean;
+
 			properties?: {
 				name: string;
 				values: [string, number][];
