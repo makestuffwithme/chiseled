@@ -31,16 +31,21 @@ pub fn handle_shortcut(
     // Small delay to ensure clipboard is updated
     std::thread::sleep(std::time::Duration::from_millis(50));
 
-    // Get the item text from clipboard and parse it
     let item_text = window
         .clipboard()
         .read_text()
         .map_err(|e| format!("Failed to read clipboard: {}", e))?;
 
-    let filters =
-        parse_item_text(&item_text).map_err(|e| format!("Failed to parse item text: {}", e))?;
+    // Quick validation - if less than 4 lines, it can't be a valid item
+    if item_text.lines().count() < 4 {
+        // Restore clipboard and return early
+        let _ = window.clipboard().write_text(prev_clipboard);
+        return Ok(());
+    }
 
-    // Send the parsed filters to the UI
+    let filters = parse_item_text(&item_text)
+        .map_err(|e| format!("Failed to parse item text: {}", e))?;
+
     window
         .emit("parsed_filters", serde_json::to_string(&filters).unwrap())
         .map_err(|e| format!("Failed to emit parsed filters: {}", e))?;

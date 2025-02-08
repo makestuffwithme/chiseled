@@ -79,6 +79,19 @@
 	}
 
 	onMount(async () => {
+		keydownHandler = async (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				event.preventDefault();
+				try {
+					await invoke('minimize_window');
+				} catch (err) {
+					console.error('Error minimizing window:', err);
+				}
+			}
+		};
+
+		window.addEventListener('keydown', keydownHandler);
+
 		await listen('parsed_filters', async (event: any) => {
 			try {
 				const parsedFilters = JSON.parse(event.payload);
@@ -106,19 +119,6 @@
 				console.error('Error parsing filters:', err);
 				error = err instanceof Error ? err.message : 'Error parsing filters';
 			}
-
-			keydownHandler = async (event: KeyboardEvent) => {
-				if (event.key === 'Escape') {
-					event.preventDefault();
-					try {
-						await invoke('minimize_window');
-					} catch (err) {
-						console.error('Error minimizing window:', err);
-					}
-				}
-			};
-
-			window.addEventListener('keydown', keydownHandler);
 		});
 	});
 
@@ -156,6 +156,9 @@
 					To start, hover over an item in POE2 and press <kbd class="px-2 py-1 bg-surface rounded"
 						>Ctrl+D</kbd
 					>
+				</p><br>
+				<p class="text-text-muted">
+					Press <kbd class="px-2 py-1 bg-surface rounded">Esc</kbd> to minimize the window and return to POE2
 				</p>
 			</div>
 		</div>
