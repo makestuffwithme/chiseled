@@ -167,10 +167,15 @@ impl TradeQuery {
             });
         }
 
-        // add price filter
-        if let Some(price) = &filters.price {
-            query["filters"]["price_filters"] = json!({
-                "filters": price,
+        if filters.price.enabled && !filters.price.option.is_empty() {
+            query["filters"]["trade_filters"] = json!({
+                "filters": {
+                    "price": {
+                        "option": filters.price.option,
+                        "min": filters.price.min,
+                        "max": filters.price.max
+                    }
+                },
                 "disabled": false
             });
         }

@@ -42,8 +42,7 @@ jobs:
           projectPath: app
           tagName: ${{ github.ref_name }}
           releaseName: ${{ github.ref_name }}
-          releaseBody: "See the assets to download this version and install."
-          releaseDraft: true
-
+          releaseBody: "Download and run the .exe or .msi to install"
+          releaseDraft: false
           prerelease: false
           includeUpdaterJson: true 

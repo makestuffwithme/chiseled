@@ -21,8 +21,7 @@ pub struct TradeFilters {
     pub implicit_mods: Vec<StatFilter>,
     pub rune_mods: Vec<StatFilter>,
 
-    // Trade Options
-    pub price: Option<PriceFilter>,
+    pub price: PriceFilter,
     pub listed_time: Option<String>,
     pub online_only: bool,
 }
@@ -126,7 +125,12 @@ impl TradeFilters {
             explicit_mods: Vec::new(),
             implicit_mods: Vec::new(),
             rune_mods: Vec::new(),
-            price: None,
+            price: PriceFilter {
+                enabled: false,
+                option: String::new(),
+                min: None,
+                max: None,
+            },
             listed_time: None,
             online_only: true,
         }

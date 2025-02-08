@@ -10,11 +10,12 @@
 	};
 
 	const options = [
-		{ value: '', label: 'Any Currency' },
-		{ value: 'chaos', label: 'Chaos Orbs' },
+		{ value: '', label: 'Exalted Orb Equivalent' },
+		{ value: 'exalted', label: 'Exalted Orbs' },
 		{ value: 'divine', label: 'Divine Orbs' },
-		{ value: 'exalted', label: 'Exalted Orbs' }
+		{ value: 'exalted_divine', label: 'Exalted Orbs or Divine Orbs' }
 	];
+
 
 	function updateFilter(key: 'min' | 'max', newValue: string) {
 		filter[key] = newValue === '' ? null : Number(newValue);
@@ -25,7 +26,10 @@
 <FilterRow
 	enabled={filter.enabled}
 	label="Price"
-	onToggle={(checked) => (filter.enabled = checked)}
+	onToggle={(value) => {
+		filter.enabled = value;
+		filter = filter;
+	}}
 >
 	<RangeInputs
 		min={filter.min}

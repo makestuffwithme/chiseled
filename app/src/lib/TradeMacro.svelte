@@ -55,7 +55,7 @@
 		explicit_mods: StatFilter[];
 		implicit_mods: StatFilter[];
 		rune_mods: StatFilter[];
-		price: PriceFilter | null;
+		price: PriceFilter;
 		listed_time: string | null;
 		online_only: boolean;
 	}
@@ -241,11 +241,10 @@
 					<ToggleFilter
 						checked={filters!.online_only}
 						label="Online Only"
-						onToggle={(checked) => (filters!.online_only = checked)}
 					/>
 
 					<PriceFilterInput
-						filter={filters?.price ?? { enabled: false, option: '', min: null, max: null }}
+						filter={filters!.price}
 					/>
 				</FilterGroup>
 
