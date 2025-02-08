@@ -1,19 +1,7 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import type { Writable } from 'svelte/store';
-
 	export let enabled: boolean = true;
 	export let label: string;
 	export let onToggle: (checked: boolean) => void;
-
-	const groupState = getContext<Writable<boolean>>('filterGroup');
-
-	$: if (groupState) {
-		groupState.subscribe((groupEnabled) => {
-			enabled = groupEnabled;
-			onToggle(groupEnabled);
-		});
-	}
 </script>
 
 <div class="p-0.5">
