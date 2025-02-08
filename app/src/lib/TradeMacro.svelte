@@ -69,6 +69,16 @@
 	let hasBeenResized = false;
 	let keydownHandler: (event: KeyboardEvent) => Promise<void>;
 
+	// Reset filter group states when new filters are parsed
+	$: if (filters) {
+		// Reset all filter groups to enabled by default
+		const filterGroups = document.querySelectorAll('.filter-group-checkbox') as NodeListOf<HTMLInputElement>;
+		filterGroups.forEach(checkbox => {
+			checkbox.checked = true;
+			checkbox.dispatchEvent(new Event('change'));
+		});
+	}
+
 	onMount(async () => {
 		await listen('parsed_filters', async (event: any) => {
 			try {

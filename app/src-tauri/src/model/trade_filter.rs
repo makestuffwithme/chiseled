@@ -126,7 +126,7 @@ impl TradeFilters {
             implicit_mods: Vec::new(),
             rune_mods: Vec::new(),
             price: PriceFilter {
-                enabled: false,
+                enabled: true,
                 option: String::new(),
                 min: None,
                 max: None,

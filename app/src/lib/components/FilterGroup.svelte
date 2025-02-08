@@ -27,7 +27,7 @@
 	<div class="flex items-center gap-2 mb-1">
 		<input
 			type="checkbox"
-			class="w-4 h-4 rounded border-gray-300"
+			class="w-4 h-4 rounded border-gray-300 filter-group-checkbox"
 			bind:checked={enabled}
 			on:change={handleGroupToggle}
 		/>
