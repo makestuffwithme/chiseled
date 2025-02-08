@@ -121,18 +121,13 @@ impl TradeQuery {
         // Add name filter if enabled (for unique items)
         if let Some(name) = &filters.item_name {
             if name.enabled {
-                query["query"] = json!({
-                    "name": name.text,
-                    "type": filters.item_base_type.as_ref().map(|t| t.text.clone()).unwrap_or_default()
-                });
+                query["name"] = json!(name.text);
             }
         }
         // Add type filter if enabled (for non-unique items)
         else if let Some(base_type) = &filters.item_base_type {
             if base_type.enabled {
-                query["query"] = json!({
-                    "type": base_type.text
-                });
+                query["type"] = json!(base_type.text);
             }
         }
 
