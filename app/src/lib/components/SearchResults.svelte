@@ -99,18 +99,19 @@
 		return `${diffDays}d ago`;
 	}
 
-	function getRarityClass(frameType: number): string {
-		switch (frameType) {
-			case 0:
-				return 'text-white'; // Normal
-			case 1:
-				return 'text-blue-400'; // Magic
-			case 2:
-				return 'text-yellow-400'; // Rare
-			case 3:
-				return 'text-orange-400'; // Unique
-			case 5:
-				return 'text-primary'; // Special (e.g. Runes)
+	function getRarityClass(rarity: string | undefined): string {
+		if (!rarity) return 'text-white';
+		switch (rarity.toLowerCase()) {
+			case 'normal':
+				return 'text-white';
+			case 'magic':
+				return 'text-blue-400';
+			case 'rare':
+				return 'text-yellow-400';
+			case 'unique':
+				return 'text-orange-400';
+			case 'special':
+				return 'text-gray-400';
 			default:
 				return 'text-white';
 		}
@@ -202,10 +203,15 @@
 									class="w-12 h-12 object-contain bg-black/50 rounded"
 								/>
 								<div class="flex flex-col">
-									<span class={getRarityClass(result.item.frameType)}>{result.item.name}</span>
-									<span class="text-text-muted text-sm">{result.item.baseType}</span>
+									<span class={getRarityClass(result.item.rarity)}>{result.item.name}</span>
+									{#if result.item.name === ''}
+										<span class={getRarityClass(result.item.rarity)}>{result.item.baseType}</span>
+									{:else}
+										<span class="text-text-muted text-sm">{result.item.baseType}</span>
+									{/if}
 									<span class="text-text-muted text-sm">Item Level: {result.item.ilvl}</span>
 									{#if result.item.corrupted}
+
 										<span class="text-red-500 text-sm">Corrupted</span>
 									{/if}
 								</div>
