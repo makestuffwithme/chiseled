@@ -262,8 +262,21 @@
 						/>
 					{/if}
 
+					<!-- Rarity Filter -->
+					{#if filters.rarity}
+						<TextFilterInput filter={filters.rarity} label="Rarity" options={[
+							{ value: "", label: "Any Rarity"},
+							{ value: "unique", label: "Unique"},
+							{ value: "rare", label: "Rare"},
+							{ value: "magic", label: "Magic"},
+							{ value: "normal", label: "Normal"},
+							{ value: "nonunique", label: "Any Non-Unique"},
+						]} />
+					{/if}
+
 					<!-- Item Level Filter -->
 					{#if filters.item_level}
+
 						<RangeFilterInput filter={filters.item_level} label="Item Level" />
 					{/if}
 

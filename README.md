@@ -1,4 +1,4 @@
-# POE2 Price Checker - [download the latest release](https://github.com/nuttymode/chiseled/releases/latest)
+# path of exile 2 trade tool - [download the latest release](https://github.com/nuttymode/chiseled/releases/latest)
 
 ![image](https://github.com/user-attachments/assets/53ad8ef6-1f43-451c-b9d0-96b1db387cf9)
 

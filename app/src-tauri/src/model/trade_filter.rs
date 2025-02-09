@@ -205,26 +205,38 @@ impl TradeFilters {
             .filter(|line| !line.is_empty())
             .collect();
 
-        if header_lines.len() < 3 || header_lines.len() > 4 {
-            return Err("Invalid item format: header should be 3 or 4 lines".to_string());
+        if header_lines.len() < 2 || header_lines.len() > 4 {
+            return Err("Invalid item format: header should be between 2 and 4 lines".to_string());
         }
 
+        let rarity_line = if header_lines.len() == 2 {
+            header_lines[0]
+        } else {
+            header_lines[1]
+        };
+
         // Parse rarity
-        let rarity = header_lines[1]
-            .strip_prefix("Rarity: ")
+        let rarity = rarity_line.strip_prefix("Rarity: ")
             .ok_or("Missing rarity")?;
         filters.rarity = Some(TextFilter {
-            text: rarity.to_string(),
+            text: rarity.to_string().to_lowercase(),
             enabled: true,
         });
 
         // Parse item name and base type based on rarity
         match rarity {
             "Currency" => {
-                filters.item_base_type = Some(TextFilter {
-                    text: header_lines[2].to_string(),
-                    enabled: true,
-                });
+                if header_lines.len() == 3 {
+                    filters.item_base_type = Some(TextFilter {
+                        text: header_lines[2].to_string(),
+                        enabled: true,
+                    });
+                } else {
+                    filters.item_base_type = Some(TextFilter {
+                        text: header_lines[1].to_string(),
+                        enabled: true,
+                    });
+                }
             }
             "Unique" => {
                 // For unique items, we care about the name but not the base type or category

@@ -150,6 +150,13 @@ impl TradeQuery {
         let mut equipment_filters = json!({});
         let mut has_equipment_filters = false;
 
+        if let Some(rarity) = &filters.rarity {
+            if rarity.enabled && rarity.text != "" {
+                equipment_filters["rarity"] = json!(rarity.text);
+                has_equipment_filters = true;
+            }
+        }
+
         if let Some(pdps) = &filters.physical_dps {
             if pdps.enabled {
                 equipment_filters["pdps"] = json!({"min": pdps.min, "max": pdps.max});
