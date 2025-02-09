@@ -16,7 +16,8 @@
         "height": 130,
         "center": true,
         "transparent": false,
-        "dragDropEnabled": false
+        "dragDropEnabled": false,
+        "skipTaskbar": true
       }
     ],
     "security": {

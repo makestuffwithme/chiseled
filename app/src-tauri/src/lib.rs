@@ -106,6 +106,6 @@ async fn search_trade(filters: String) -> Result<String, String> {
 #[tauri::command]
 async fn minimize_window(app_handle: tauri::AppHandle) {
     if let Some(window) = app_handle.get_webview_window("main") {
-        let _ = window.minimize();
+        let _ = window.hide();
     }
 }
