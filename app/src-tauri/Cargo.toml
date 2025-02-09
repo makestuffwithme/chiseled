@@ -1,10 +1,10 @@
 [package]
-name = "chiseled-poe-trade"
+name = "chiseled"
 version = "0.3.1"
 description = "price check items in POE2"
 authors = ["nuttymode"]
 license = "MIT"
-repository = "https://github.com/nuttymode/chiseled-poe-trade"
+repository = "https://github.com/nuttymode/chiseled"
 edition = "2021"
 rust-version = "1.77.2"
 

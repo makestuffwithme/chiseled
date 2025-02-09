@@ -586,7 +586,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
 
 [[package]]
-name = "chiseled-poe-trade"
+name = "chiseled"
 version = "0.3.1"
 dependencies = [
  "dirs 6.0.0",

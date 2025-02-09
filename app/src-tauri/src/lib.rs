@@ -16,7 +16,7 @@ mod service;
 mod tray;
 
 fn create_client() -> Result<Client, reqwest::Error> {
-    Client::builder().user_agent("chiseled-poe-trade").build()
+    Client::builder().user_agent("chiseled-price-checker").build()
 }
 
 fn show_error(app_handle: &tauri::AppHandle, e: String) {
