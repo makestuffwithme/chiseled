@@ -35,10 +35,7 @@ impl TradeQuery {
                 } else {
                     stat_filters.push(json!({
                         "id": stat.id,
-                        "disabled": false,
-                        "value": {
-                            "option": true
-                        }
+                        "disabled": false
                     }));
                 }
             }

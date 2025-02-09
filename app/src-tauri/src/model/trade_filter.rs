@@ -226,6 +226,7 @@ impl TradeFilters {
         // Parse item name and base type based on rarity
         match rarity {
             "Currency" => {
+                filters.rarity = None;
                 if header_lines.len() == 3 {
                     filters.item_base_type = Some(TextFilter {
                         text: header_lines[2].to_string(),

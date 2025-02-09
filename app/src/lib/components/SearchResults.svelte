@@ -177,10 +177,20 @@
 					<div class="text-text-muted text-sm whitespace-nowrap">
 						{getRelativeTime(result.listing?.indexed)}
 					</div>
+					{#if result.item.corrupted}
+						<div class="flex items-center">
+							<img
+								src="https://web.poecdn.com/image/Art/2DItems/Currency/CurrencyVaal.png"
+								alt="Corrupted"
+								class="w-6 h-6"
+							/>
+						</div>
+					{/if}
 					<div class="text-text flex items-center gap-2 ml-auto">
-						<span>{result.listing?.account?.name}</span>
+						<span class="text-sm">{result.listing?.account?.name}</span>
 						{#if result.listing?.account?.online}
 							<span
+
 								class="text-xs text-primary bg-primary/10 px-1.5 py-0.5 rounded-full flex items-center gap-1"
 							>
 								Online
