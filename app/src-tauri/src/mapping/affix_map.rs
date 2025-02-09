@@ -35,7 +35,7 @@ impl AffixMap {
         })
     }
 
-    pub fn affix_to_trade_stat(&self, text: &str, prefix: &str) -> Option<(String, Vec<f32>)> {
+    pub fn affix_to_trade_stat(&self, text: &str, prefix: &str) -> Option<(String, Vec<f64>)> {
         let (normalized_text, values) = normalize_mod_text(text);
 
         if let Some(ids) = self.mapping.get(&normalized_text) {
@@ -66,7 +66,7 @@ fn normalize_pattern(text: &str) -> String {
     normalized_words.join(" ")
 }
 
-fn normalize_mod_text(text: &str) -> (String, Vec<f32>) {
+fn normalize_mod_text(text: &str) -> (String, Vec<f64>) {
     let mut values = Vec::new();
     let mut normalized = text.to_string();
 
@@ -74,7 +74,7 @@ fn normalize_mod_text(text: &str) -> (String, Vec<f32>) {
     let number_pattern = regex::Regex::new(r"(\+?\-?\d+\.?\d*)").unwrap();
     while let Some(caps) = number_pattern.captures(&normalized) {
         let full_match = caps.get(0).unwrap();
-        values.push(full_match.as_str().parse::<f32>().unwrap_or(0.0));
+        values.push(full_match.as_str().parse::<f64>().unwrap_or(0.0));
         normalized.replace_range(full_match.range(), "#");
     }
 

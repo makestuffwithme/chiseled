@@ -63,14 +63,14 @@ pub struct StatValue {
 }
 
 impl StatValue {
-    pub fn from_values(values: &[f32]) -> Self {
+    pub fn from_values(values: &[f64]) -> Self {
         if values.is_empty() {
             StatValue {
                 min: None,
                 max: None,
             }
         } else {
-            let avg = values.iter().sum::<f32>() as f64 / values.len() as f64;
+            let avg = values.iter().sum::<f64>() / values.len() as f64;
             StatValue {
                 min: Some(avg),
                 max: None,
@@ -184,7 +184,7 @@ impl TradeFilters {
     }
 
     pub fn from_text(
-        parse_mod: impl Fn(&str, &str) -> Option<(String, Vec<f32>)>,
+        parse_mod: impl Fn(&str, &str) -> Option<(String, Vec<f64>)>,
         find_base_type: impl Fn(&str) -> Option<(String, String)>,
         text: &str,
     ) -> Result<Self, String> {
