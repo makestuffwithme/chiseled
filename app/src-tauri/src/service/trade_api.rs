@@ -4,23 +4,44 @@ use serde_json::Value;
 use crate::model::trade_query::TradeQuery;
 use crate::model::trade_result::TradeResult;
 
-pub async fn fetch_mappings(client: &Client) -> Result<(Value, Value), reqwest::Error> {
-    async fn fetch_stats(client: &Client) -> Result<Value, reqwest::Error> {
-        client
-            .get("https://www.pathofexile.com/api/trade2/data/stats")
-            .send()
-            .await?
-            .json()
-            .await
+async fn check_error_response(response_text: &str) -> Result<Value, String> {
+    if !response_text.starts_with('{') {
+        return Err(format!("Invalid JSON response: {}", response_text));
     }
 
-    async fn fetch_items(client: &Client) -> Result<Value, reqwest::Error> {
-        client
+    let json: Value = serde_json::from_str(response_text)
+        .map_err(|e| format!("Failed to parse response: {}", e))?;
+
+    if let Some(error) = json.get("error") {
+        if let Some(message) = error.get("message") {
+            return Err(message.as_str().unwrap_or("Unknown error").to_string());
+        }
+    }
+
+    Ok(json)
+}
+
+pub async fn fetch_mappings(client: &Client) -> Result<(Value, Value), String> {
+    async fn fetch_stats(client: &Client) -> Result<Value, String> {
+        let response = client
+            .get("https://www.pathofexile.com/api/trade2/data/stats")
+            .send()
+            .await
+            .map_err(|e| format!("Stats request failed: {}", e))?;
+
+        let text = response.text().await.map_err(|e| e.to_string())?;
+        check_error_response(&text).await
+    }
+
+    async fn fetch_items(client: &Client) -> Result<Value, String> {
+        let response = client
             .get("https://www.pathofexile.com/api/trade2/data/items")
             .send()
-            .await?
-            .json()
             .await
+            .map_err(|e| format!("Items request failed: {}", e))?;
+
+        let text = response.text().await.map_err(|e| e.to_string())?;
+        check_error_response(&text).await
     }
 
     tokio::try_join!(fetch_stats(client), fetch_items(client))
@@ -38,13 +59,7 @@ pub async fn search_trade(client: &Client, query: &TradeQuery) -> Result<String,
     log::info!("Search query: {}", &query.query);
 
     let search_text = response.text().await.map_err(|e| e.to_string())?;
-    if !search_text.starts_with('{') {
-        return Err(format!("Invalid search response: {}", search_text));
-    }
-
-    // Parse the search response
-    let search_json: Value = serde_json::from_str(&search_text)
-        .map_err(|e| format!("Failed to parse search response: {}", e))?;
+    let search_json = check_error_response(&search_text).await?;
 
     log::info!("Search JSON: {}", search_json);
 
@@ -75,9 +90,7 @@ pub async fn search_trade(client: &Client, query: &TradeQuery) -> Result<String,
         .map_err(|e| format!("Fetch request failed: {}", e))?;
 
     let fetch_text = fetch_response.text().await.map_err(|e| e.to_string())?;
-    if !fetch_text.starts_with('{') {
-        return Err(format!("Invalid fetch response: {}", fetch_text));
-    }
+    check_error_response(&fetch_text).await?;
 
     // Parse into our TradeResult struct
     let trade_result: TradeResult = match serde_json::from_str(&fetch_text) {

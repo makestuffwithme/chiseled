@@ -168,11 +168,6 @@
 					<div class="font-semibold text-primary whitespace-nowrap">
 						{result.listing?.price?.amount}
 						{result.listing?.price?.currency}
-						{#if result.listing?.price?.currency === 'chaos'}
-							<span class="text-text-muted text-sm font-normal"
-								>(≈{(result.listing?.price?.amount / 160).toFixed(1)}div)</span
-							>
-						{/if}
 					</div>
 					<div class="text-text-muted text-sm whitespace-nowrap">
 						{getRelativeTime(result.listing?.indexed)}
