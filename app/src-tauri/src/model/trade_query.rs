@@ -174,6 +174,12 @@ impl TradeQuery {
                 has_equipment_filters = true;
             }
         }
+        if let Some(sockets) = &filters.socket_count {
+            if sockets.enabled {
+                equipment_filters["rune_sockets"] = json!({"min": sockets.min, "max": sockets.max});
+                has_equipment_filters = true;
+            }
+        }
 
         if has_equipment_filters {
             query["filters"]["equipment_filters"] = json!({

@@ -15,6 +15,7 @@ pub struct TradeFilters {
     pub total_dps: Option<RangeFilter>,
     pub attack_speed: Option<RangeFilter>,
     pub critical_chance: Option<RangeFilter>,
+    pub socket_count: Option<RangeFilter>,
 
     // Stat Filters
     pub explicit_mods: Vec<StatFilter>,
@@ -167,6 +168,7 @@ impl TradeFilters {
             total_dps: None,
             attack_speed: None,
             critical_chance: None,
+            socket_count: None,
             explicit_mods: Vec::new(),
             implicit_mods: Vec::new(),
             rune_mods: Vec::new(),
@@ -262,7 +264,14 @@ impl TradeFilters {
                 continue;
             }
 
-            if let Some(level) = line.strip_prefix("Item Level: ") {
+            if let Some(sockets) = line.strip_prefix("Sockets: ") {
+                let socket_count = sockets.split_whitespace().count();
+                filters.socket_count = Some(RangeFilter {
+                    min: Some(socket_count as f64),
+                    max: None,
+                    enabled: true,
+                });
+            } else if let Some(level) = line.strip_prefix("Item Level: ") {
                 let level: f64 = level
                     .parse()
                     .map_err(|e| format!("Failed to parse item level: {}", e))?;
@@ -630,6 +639,18 @@ Leeches 5.85% of Physical Damage as Mana"#;
                 enabled: true,
             })
         );
+
+        // Check socket count
+        assert_eq!(
+            filters.socket_count,
+            Some(RangeFilter {
+                min: Some(2.0),
+                max: None,
+                enabled: true,
+            })
+        );
+
+        // Check rarity
         assert_eq!(
             filters.rarity,
             Some(TextFilter {

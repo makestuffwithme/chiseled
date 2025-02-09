@@ -54,6 +54,7 @@
 		total_dps: RangeFilter | null;
 		attack_speed: RangeFilter | null;
 		critical_chance: RangeFilter | null;
+		socket_count: RangeFilter | null;
 		explicit_mods: StatFilter[];
 		implicit_mods: StatFilter[];
 		rune_mods: StatFilter[];
@@ -288,9 +289,15 @@
 					{#if filters.critical_chance}
 						<RangeFilterInput filter={filters.critical_chance} label="Critical Hit Chance" />
 					{/if}
+
+					<!-- Socket Count Filter -->
+					{#if filters.socket_count}
+						<RangeFilterInput filter={filters.socket_count} label="Socket Count" />
+					{/if}
 				</FilterGroup>
 
 				<!-- Explicit Mods -->
+
 				{#if filters.explicit_mods.length > 0}
 					<FilterGroup title="Explicit Mods">
 						{#each filters.explicit_mods as mod}
