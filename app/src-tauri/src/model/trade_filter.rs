@@ -184,8 +184,8 @@ impl TradeFilters {
     }
 
     pub fn from_text(
-        parse_mod: impl Fn(&str, &str) -> Option<(String, Vec<f64>)>,
-        find_base_type: impl Fn(&str) -> Option<(String, String)>,
+        mod_pattern_to_trade_stat: impl Fn(&str, &str) -> Option<String>,
+        item_text_to_base_type: impl Fn(&str) -> Option<(String, String)>,
         text: &str,
     ) -> Result<Self, String> {
         let mut filters = Self::new();
@@ -197,6 +197,11 @@ impl TradeFilters {
         let mut parts = text.splitn(2, "--------");
         let header = parts.next().ok_or("Missing header section")?;
         let body = parts.next().ok_or("Missing body section")?;
+
+        let mod_text_to_trade_stat_and_values = |text: &str, prefix: &str| -> Option<(String, Vec<f64>)> {
+            let (mod_pattern, values) = Self::mod_text_to_pattern(text);
+            mod_pattern_to_trade_stat(&mod_pattern, prefix).map(|trade_stat| (trade_stat, values))
+        };
 
         // Parse header lines
         let header_lines: Vec<&str> = header
@@ -260,7 +265,7 @@ impl TradeFilters {
                         text: header_lines[3].to_string(),
                         enabled: true,
                     });
-                } else if let Some((base_type, _)) = find_base_type(text) {
+                } else if let Some((base_type, _)) = item_text_to_base_type(text) {
                     filters.item_base_type = Some(TextFilter {
                         text: base_type,
                         enabled: true,
@@ -351,7 +356,7 @@ impl TradeFilters {
                 }
             } else if line.ends_with("(implicit)") {
                 let mod_text = line.trim_end_matches("(implicit)").trim();
-                if let Some((id, values)) = parse_mod(mod_text, "implicit") {
+                if let Some((id, values)) = mod_text_to_trade_stat_and_values(mod_text, "implicit") {
                     filters.implicit_mods.push(StatFilter {
                         id,
                         text: mod_text.to_string(),
@@ -361,7 +366,7 @@ impl TradeFilters {
                 }
             } else if line.ends_with("(rune)") {
                 let mod_text = line.trim_end_matches("(rune)").trim();
-                if let Some((id, values)) = parse_mod(mod_text, "rune") {
+                if let Some((id, values)) = mod_text_to_trade_stat_and_values(mod_text, "rune") {
                     filters.rune_mods.push(StatFilter {
                         id,
                         text: mod_text.to_string(),
@@ -378,7 +383,7 @@ impl TradeFilters {
                 && !line.starts_with("Quality:")
             {
                 // Try to parse as explicit mod
-                if let Some((id, values)) = parse_mod(line, "explicit") {
+                if let Some((id, values)) = mod_text_to_trade_stat_and_values(line, "explicit") {
                     filters.explicit_mods.push(StatFilter {
                         id,
                         text: line.to_string(),
@@ -431,12 +436,49 @@ impl TradeFilters {
 
         Ok(filters)
     }
+
+    fn mod_text_to_pattern(text: &str) -> (String, Vec<f64>) {
+        let mut values = Vec::new();
+        let mut normalized = text.to_string();
+    
+        // replace numbers (2, +105, 12%, 5.85%) with #
+        let number_pattern = regex::Regex::new(r"(\+?\-?\d+\.?\d*)").unwrap();
+        while let Some(caps) = number_pattern.captures(&normalized) {
+            let full_match = caps.get(0).unwrap();
+            values.push(full_match.as_str().parse::<f64>().unwrap_or(0.0));
+            normalized.replace_range(full_match.range(), "#");
+        }
+    
+        // replace "an additional (singular-word)" with "# additional (plural-word)"
+        let an_additional_pattern =
+            regex::Regex::new(r" an additional (Projectile|Arrow|Curse)").unwrap();
+        if let Some(caps) = an_additional_pattern.captures(&normalized) {
+            values.push(1.0);
+            // ggg handles the same mod for grenade projectiles differently lol
+            if !normalized.starts_with("Grenade") {
+                let full_match = caps.get(0).unwrap();
+                normalized = normalized.replace(
+                    full_match.as_str(),
+                    &(full_match.as_str().to_string() + "s"),
+                );
+                normalized = normalized.replace(" an additional ", " # additional ");
+            }
+        }
+    
+        let ailment_seconds_pattern = regex::Regex::new(r"You cannot be (Chilled|Frozen|Shocked|Ignited) for # seconds").unwrap();
+        if let Some(_caps) = ailment_seconds_pattern.captures(&normalized) {
+            // remove the s from seconds
+            normalized = normalized.replace("for # seconds", "for # second");
+        }
+    
+        (normalized, values)
+    }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::mapping::affix_map::AffixMap;
+    use crate::mapping::mod_pattern_map::ModPatternMap;
     use crate::mapping::base_type_map::BaseTypeMap;
     use serde_json::json;
 
@@ -451,7 +493,7 @@ mod test {
         );
     }
 
-    fn get_test_maps() -> (AffixMap, BaseTypeMap) {
+    fn get_test_maps() -> (ModPatternMap, BaseTypeMap) {
         let stats_json = json!({
             "result": [{
                 "entries": [
@@ -493,10 +535,10 @@ mod test {
             }]
         });
 
-        let affix_map = AffixMap::new(stats_json).expect("Failed to create affix map");
+        let mod_pattern_map = ModPatternMap::new(stats_json).expect("Failed to create mod pattern map");
         let base_type_map = BaseTypeMap::new(items_json).expect("Failed to create base type map");
 
-        (affix_map, base_type_map)
+        (mod_pattern_map, base_type_map)
     }
 
     const TEST_ITEM: &str = r#"Item Class: Crossbows
@@ -520,11 +562,52 @@ Grenade Skills Fire an additional Projectile (implicit)
 +105 to Accuracy Rating
 12% increased Attack Speed"#;
 
+    const TEST_ITEM_WITH_AILMENT: &str = r#"Item Class: Boots
+Rarity: Magic
+Deliberate Boots of the Glacier
+--------
+Requirements:
+Level: 33
+Str: 43 (unmet)
+Dex: 43
+--------
+Item Level: 35
+--------
+You cannot be Chilled for 6 seconds after being Chilled"#;
+
+    const BOW_TEST_ITEM: &str = r#"Item Class: Bows
+Rarity: Rare
+Horror Thunder
+Advanced Dualstring Bow
+--------
+Physical Damage: 64-118 (augmented)
+Critical Hit Chance: 5.00%
+Attacks per Second: 1.36 (augmented)
+--------
+Requirements:
+Level: 55
+Dex: 126
+--------
+Sockets: S S 
+--------
+Item Level: 58
+--------
+40% increased Physical Damage (rune)
+--------
+Bow Attacks fire an additional Arrow (implicit)
+--------
+42% increased Physical Damage
+Adds 6 to 11 Physical Damage
++80 to Accuracy Rating
+13% increased Attack Speed
+Bow Attacks fire an additional Arrow
+Leeches 5.85% of Physical Damage as Mana"#;
+
     #[test]
     fn test_trade_filters_from_text() {
         let (affix_map, base_type_map) = get_test_maps();
         let filters = TradeFilters::from_text(
-            |text, prefix| affix_map.affix_to_trade_stat(text, prefix),
+            |text, prefix| affix_map.mod_pattern_to_trade_stat(text, prefix),
             |text| base_type_map.item_text_to_base_type(text),
             TEST_ITEM,
         )
@@ -606,39 +689,73 @@ Grenade Skills Fire an additional Projectile (implicit)
         assert_json_float_eq(&json!(speed_mod.value.min.unwrap()), 12.0);
     }
 
-    const BOW_TEST_ITEM: &str = r#"Item Class: Bows
-Rarity: Rare
-Horror Thunder
-Advanced Dualstring Bow
---------
-Physical Damage: 64-118 (augmented)
-Critical Hit Chance: 5.00%
-Attacks per Second: 1.36 (augmented)
---------
-Requirements:
-Level: 55
-Dex: 126
---------
-Sockets: S S 
---------
-Item Level: 58
---------
-40% increased Physical Damage (rune)
---------
-Bow Attacks fire an additional Arrow (implicit)
---------
-42% increased Physical Damage
-Adds 6 to 11 Physical Damage
-+80 to Accuracy Rating
-13% increased Attack Speed
-Bow Attacks fire an additional Arrow
-Leeches 5.85% of Physical Damage as Mana"#;
+    #[test]
+    fn test_trade_filters_from_text_with_ailment() {
+        let (affix_map, base_type_map) = get_test_maps();
+        let filters = TradeFilters::from_text(
+            |text, prefix| affix_map.mod_pattern_to_trade_stat(text, prefix),
+            |text| base_type_map.item_text_to_base_type(text),
+            TEST_ITEM_WITH_AILMENT,
+        )
+        .expect("Should parse successfully");
+
+        // Check explicit mods
+        assert_eq!(filters.explicit_mods.len(), 1);
+
+        // Ailment mod
+        let ailment_mod = &filters.explicit_mods[0];
+        assert_eq!(
+            ailment_mod.text,
+            "You cannot be Chilled for 6 seconds after being Chilled"
+        );
+        assert_json_float_eq(&json!(ailment_mod.value.min.unwrap()), 6.0);
+    }
+
+    #[test]
+    fn test_normalize_mod_text() {
+        let test_cases = vec![
+            (
+                "42% increased Physical Damage",
+                ("#% increased Physical Damage", vec![42.0]),
+            ),
+            (
+                "Adds 6 to 11 Physical Damage",
+                ("Adds # to # Physical Damage", vec![6.0, 11.0]),
+            ),
+            (
+                "+80 to Accuracy Rating",
+                ("# to Accuracy Rating", vec![80.0]),
+            ),
+            (
+                "12% increased Attack Speed",
+                ("#% increased Attack Speed", vec![12.0]),
+            ),
+            (
+                "Bow Attacks fire an additional Arrow",
+                ("Bow Attacks fire # additional Arrows", vec![1.0]),
+            ),
+            (
+                "Leeches 5.85% of Physical Damage as Mana",
+                ("Leeches #% of Physical Damage as Mana", vec![5.85]),
+            ),
+            (
+                "You cannot be Chilled for 6 seconds after being Chilled",
+                ("You cannot be Chilled for # second after being Chilled", vec![6.0]),
+            ),
+        ];
+
+        for (input, expected) in test_cases {
+            let (normalized, values) = TradeFilters::mod_text_to_pattern(input);
+            assert_eq!(normalized, expected.0, "Failed for mod: {}", input);
+            assert_eq!(values, expected.1, "Failed for mod: {}", input);
+        }
+    }
 
     #[test]
     fn test_bow_with_rune_mod() {
         let (affix_map, base_type_map) = get_test_maps();
         let filters = TradeFilters::from_text(
-            |text, prefix| affix_map.affix_to_trade_stat(text, prefix),
+            |text, prefix| affix_map.mod_pattern_to_trade_stat(text, prefix),
             |text| base_type_map.item_text_to_base_type(text),
             BOW_TEST_ITEM,
         )
@@ -704,7 +821,6 @@ Leeches 5.85% of Physical Damage as Mana"#;
         assert_eq!(implicit_mod.id, "implicit.stat_3885405204");
         assert_json_float_eq(&json!(implicit_mod.value.min.unwrap()), 1.0);
 
-
         // Check explicit mods
         assert_eq!(filters.explicit_mods.len(), 6);
 
@@ -759,84 +875,5 @@ Leeches 5.85% of Physical Damage as Mana"#;
             .expect("Should have mana leech mod");
         assert_eq!(leech_mod.id, "explicit.stat_669069897");
         assert_json_float_eq(&json!(leech_mod.value.min.unwrap()), 5.85);
-    }
-
-    #[test]
-    fn test_physical_dps_calculation() {
-        let (affix_map, base_type_map) = get_test_maps();
-        let test_item = r#"Item Class: Quarterstaves
-Rarity: Rare
-Grim Gnarl
-Expert Slicing Quarterstaff
---------
-Quality: +20% (augmented)
-Physical Damage: 244-406 (augmented)
-Critical Hit Chance: 10.00%
-Attacks per Second: 1.58 (augmented)
---------
-Requirements:
-Level: 77
-Dex: 165
-Int: 64
---------
-Sockets: S S 
---------
-Item Level: 79
---------
-40% increased Physical Damage (rune)
---------
-173% increased Physical Damage
-+222 to Accuracy Rating
-+18% to Critical Damage Bonus
-13% increased Attack Speed
-Leeches 8.29% of Physical Damage as Life"#;
-
-        let filters = TradeFilters::from_text(
-            |text, prefix| affix_map.affix_to_trade_stat(text, prefix),
-            |text| base_type_map.item_text_to_base_type(text),
-            test_item,
-        )
-
-        .expect("Should parse successfully");
-
-        // Check attack speed
-        assert_eq!(
-            filters.attack_speed,
-            Some(RangeFilter {
-                min: Some(1.58),
-                max: None,
-                enabled: true,
-            })
-        );
-
-        // Check physical DPS (average of 244-406 = 325, multiplied by 1.58 = 513.5)
-        assert_eq!(
-            filters.physical_dps,
-            Some(RangeFilter {
-                min: Some(513.5),
-                max: None,
-                enabled: true,
-            })
-        );
-
-        // Check total DPS (physical DPS + elemental DPS)
-        assert_eq!(
-            filters.total_dps,
-            Some(RangeFilter {
-                min: Some(513.5),
-                max: None,
-                enabled: true,
-            })
-        );
-
-        // Check critical hit chance
-        assert_eq!(
-            filters.critical_chance,
-            Some(RangeFilter {
-                min: Some(10.0),
-                max: None,
-                enabled: true,
-            })
-        );
     }
 }

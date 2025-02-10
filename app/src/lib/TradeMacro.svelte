@@ -72,7 +72,6 @@
 
 	// Reset filter group states when new filters are parsed
 	$: if (filters) {
-		// Reset all filter groups to enabled by default
 		const filterGroups = document.querySelectorAll('.filter-group-checkbox') as NodeListOf<HTMLInputElement>;
 		filterGroups.forEach(checkbox => {
 			checkbox.checked = true;
@@ -276,31 +275,7 @@
 
 					<!-- Item Level Filter -->
 					{#if filters.item_level}
-
 						<RangeFilterInput filter={filters.item_level} label="Item Level" />
-					{/if}
-
-					<!-- Attack Speed Filter -->
-					{#if filters.attack_speed}
-						<RangeFilterInput filter={filters.attack_speed} label="Attacks per Second" />
-					{/if}
-
-					<!-- DPS Filters -->
-					{#if filters.physical_dps || filters.elemental_dps || filters.total_dps}
-						{#if filters.physical_dps}
-							<RangeFilterInput filter={filters.physical_dps} label="Physical DPS" />
-						{/if}
-						{#if filters.elemental_dps}
-							<RangeFilterInput filter={filters.elemental_dps} label="Elemental DPS" />
-						{/if}
-						{#if filters.total_dps}
-							<RangeFilterInput filter={filters.total_dps} label="Total DPS" />
-						{/if}
-					{/if}
-
-					<!-- Critical Chance Filter -->
-					{#if filters.critical_chance}
-						<RangeFilterInput filter={filters.critical_chance} label="Critical Hit Chance" />
 					{/if}
 
 					<!-- Socket Count Filter -->
@@ -309,8 +284,35 @@
 					{/if}
 				</FilterGroup>
 
-				<!-- Explicit Mods -->
+				<!-- Damage Filters -->
+				{#if filters.attack_speed || filters.physical_dps || filters.elemental_dps || filters.total_dps || filters.critical_chance}
+					<FilterGroup title="Damage Filters">
+						<!-- Attack Speed Filter -->
+						{#if filters.attack_speed}
+							<RangeFilterInput filter={filters.attack_speed} label="Attacks per Second" />
+						{/if}
 
+						<!-- DPS Filters -->
+						{#if filters.physical_dps || filters.elemental_dps || filters.total_dps}
+							{#if filters.physical_dps}
+								<RangeFilterInput filter={filters.physical_dps} label="Physical DPS" />
+							{/if}
+							{#if filters.elemental_dps}
+								<RangeFilterInput filter={filters.elemental_dps} label="Elemental DPS" />
+							{/if}
+							{#if filters.total_dps}
+								<RangeFilterInput filter={filters.total_dps} label="Total DPS" />
+							{/if}
+						{/if}
+
+						<!-- Critical Chance Filter -->
+						{#if filters.critical_chance}
+							<RangeFilterInput filter={filters.critical_chance} label="Critical Hit Chance" />
+						{/if}
+					</FilterGroup>
+				{/if}
+
+				<!-- Explicit Mods -->
 				{#if filters.explicit_mods.length > 0}
 					<FilterGroup title="Explicit Mods">
 						{#each filters.explicit_mods as mod}

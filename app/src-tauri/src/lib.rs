@@ -3,7 +3,7 @@ use tauri::Manager;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
-use crate::mapping::affix_map::AffixMap;
+use crate::mapping::mod_pattern_map::ModPatternMap;
 use crate::mapping::base_type_map::BaseTypeMap;
 use crate::model::trade_filter::TradeFilters;
 use crate::model::trade_query::TradeQuery;
@@ -41,14 +41,14 @@ fn setup(app: &mut tauri::App) -> Result<(), String> {
         trade_api::fetch_mappings(&client)
     ).map_err(|e| format!("Failed to fetch trade site mappings. Are you logged in to the official trade site?\n\nError: {}", e))?;
 
-    let affix_map = AffixMap::new(stats_api_response)
-        .map_err(|e| format!("Failed to create affix map: {}", e))?;
+    let mod_pattern_map = ModPatternMap::new(stats_api_response)
+        .map_err(|e| format!("Failed to create mod pattern map: {}", e))?;
     let base_type_map = BaseTypeMap::new(items_api_response)
         .map_err(|e| format!("Failed to create base type map: {}", e))?;
 
-    let parse_item_text = move |text: &str| -> Result<TradeFilters, String> {
+    let item_text_to_trade_filters = move |text: &str| -> Result<TradeFilters, String> {
         TradeFilters::from_text(
-            |text, prefix| affix_map.affix_to_trade_stat(text, prefix),
+            |text, prefix| mod_pattern_map.mod_pattern_to_trade_stat(text, prefix),
             |text| base_type_map.item_text_to_base_type(text),
             text,
         )
@@ -58,7 +58,7 @@ fn setup(app: &mut tauri::App) -> Result<(), String> {
     let shortcut_plugin = tauri_plugin_global_shortcut::Builder::new()
         .with_handler(move |_, shortcut, event| {
             if shortcut == &ctrl_d && event.state() == ShortcutState::Pressed {
-                if let Err(e) = hotkey::handle_shortcut(&app_handle, &parse_item_text) {
+                if let Err(e) = hotkey::handle_shortcut(&app_handle, &item_text_to_trade_filters) {
                     show_error(&app_handle, e);
                 }
             }
