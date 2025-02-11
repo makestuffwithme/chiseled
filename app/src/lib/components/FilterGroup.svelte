@@ -1,17 +1,22 @@
 <script lang="ts">
+	import LockableCheckbox from './LockableCheckbox.svelte';
 	export let title: string;
 	export let enabled: boolean = true;
 
 	let groupDiv: HTMLElement;
+	const filterId = `filter-group-${title.toLowerCase().replace(/\s+/g, '-')}`;
 
-	function handleGroupToggle(e: Event) {
-		const checked = (e.target as HTMLInputElement).checked;
+	function handleGroupToggle(checked: boolean) {
+		enabled = checked;
 		
-		// Only find checkboxes that are direct children of this group
+		// Find all LockableCheckbox components within this group
 		if (groupDiv) {
-			const childCheckboxes = groupDiv.querySelectorAll(':scope > div > label > input[type="checkbox"]');
-			childCheckboxes.forEach(checkbox => {
-				if (checkbox !== e.target) {
+			const childLockableCheckboxes = groupDiv.querySelectorAll(':scope > div > label > div > input[type="checkbox"]');
+			childLockableCheckboxes.forEach(checkbox => {
+				// Skip if this checkbox is locked
+				const lockButton = checkbox.parentElement?.querySelector('button');
+				const isLocked = lockButton?.querySelector('svg')?.innerHTML.includes('v4');
+				if (!isLocked) {
 					(checkbox as HTMLInputElement).checked = checked;
 					checkbox.dispatchEvent(new Event('change'));
 				}
@@ -25,11 +30,10 @@
 	bind:this={groupDiv}
 >
 	<div class="flex items-center gap-2 mb-1">
-		<input
-			type="checkbox"
-			class="w-4 h-4 rounded border-gray-300 filter-group-checkbox"
-			bind:checked={enabled}
-			on:change={handleGroupToggle}
+		<LockableCheckbox
+			checked={enabled}
+			onChange={handleGroupToggle}
+			id={filterId}
 		/>
 		<h4 class="text-text capitalize font-semibold">{title}</h4>
 	</div>

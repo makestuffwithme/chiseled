@@ -70,14 +70,6 @@
 	let hasBeenResized = false;
 	let keydownHandler: (event: KeyboardEvent) => Promise<void>;
 
-	// Reset filter group states when new filters are parsed
-	$: if (filters) {
-		const filterGroups = document.querySelectorAll('.filter-group-checkbox') as NodeListOf<HTMLInputElement>;
-		filterGroups.forEach(checkbox => {
-			checkbox.checked = true;
-		});
-	}
-
 	onMount(async () => {
 		keydownHandler = async (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
