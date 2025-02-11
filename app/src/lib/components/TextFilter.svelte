@@ -9,13 +9,15 @@
 	export let options: { value: string; label: string }[] | undefined = undefined;
 	export let readonly = false;
 
+	const filterId = `text-filter-${label.toLowerCase().replace(/\s+/g, '-')}`;
+
 	function updateFilter(newValue: string) {
 		filter.text = newValue;
 		filter = filter;
 	}
 </script>
 
-<FilterRow enabled={filter.enabled} {label} onToggle={(value) => (filter.enabled = value)}>
+<FilterRow enabled={filter.enabled} {label} id={filterId} onToggle={(value) => (filter.enabled = value)}>
 	{#if options}
 		<select
 			class="p-0 bg-surface-dark border-border border rounded text-text disabled:opacity-50"

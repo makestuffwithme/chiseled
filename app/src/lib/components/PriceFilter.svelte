@@ -16,6 +16,7 @@
 		{ value: 'exalted_divine', label: 'Exalted Orbs or Divine Orbs' }
 	];
 
+	const filterId = 'price-filter';
 
 	function updateFilter(key: 'min' | 'max', newValue: string) {
 		filter[key] = newValue === '' ? null : Number(newValue);
@@ -26,6 +27,7 @@
 <FilterRow
 	enabled={filter.enabled}
 	label="Price"
+	id={filterId}
 	onToggle={(value) => {
 		filter.enabled = value;
 		filter = filter;

@@ -12,6 +12,8 @@
 		};
 	};
 
+	const filterId = `stat-filter-${filter.id}`;
+
 	function updateFilter(key: 'min' | 'max', newValue: string) {
 		filter.value[key] = newValue === '' ? null : Number(newValue);
 		filter = filter;
@@ -21,6 +23,7 @@
 <FilterRow
 	enabled={filter.enabled}
 	label={filter.text}
+	id={filterId}
 	onToggle={(checked) => (filter.enabled = checked)}
 >
 	<RangeInputs

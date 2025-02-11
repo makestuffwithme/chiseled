@@ -2,6 +2,20 @@
 	export let checked: boolean = false;
 	export let locked: boolean = false;
 	export let onChange: (checked: boolean) => void = () => {};
+	export let id: string;
+
+	// Load initial locked state and saved checked state from localStorage
+	$: {
+		const savedState = localStorage.getItem(`filter-lock-${id}`);
+		if (savedState) {
+			const state = JSON.parse(savedState);
+			locked = state.locked;
+			if (locked) {
+				checked = state.checkedState;
+				onChange(checked);
+			}
+		}
+	}
 
 	function handleChange(e: Event) {
 		const target = e.target as HTMLInputElement;
@@ -9,12 +23,29 @@
 			onChange(target.checked);
 		}
 	}
+
+	function toggleLock() {
+		locked = !locked;
+		if (locked) {
+			// Save state when locking
+			localStorage.setItem(
+				`filter-lock-${id}`,
+				JSON.stringify({
+					locked: true,
+					checkedState: checked
+				})
+			);
+		} else {
+			// Clear state when unlocking
+			localStorage.removeItem(`filter-lock-${id}`);
+		}
+	}
 </script>
 
 <div class="flex items-center gap-1">
 	<button
 		class="{locked ? 'text-gray-300' : 'text-gray-400'} hover:text-gray-300 transition-colors"
-		on:click={() => (locked = !locked)}
+		on:click={toggleLock}
 		title={locked ? 'Unlock' : 'Lock'}
 	>
 		<svg

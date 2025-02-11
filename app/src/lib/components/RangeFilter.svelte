@@ -9,13 +9,15 @@
 	};
 	export let label: string;
 
+	const filterId = `range-filter-${label.toLowerCase().replace(/\s+/g, '-')}`;
+
 	function updateFilter(key: 'min' | 'max', newValue: string) {
 		filter[key] = newValue === '' ? null : Number(newValue);
 		filter = filter;
 	}
 </script>
 
-<FilterRow enabled={filter.enabled} {label} onToggle={(checked) => (filter.enabled = checked)}>
+<FilterRow enabled={filter.enabled} {label} id={filterId} onToggle={(checked) => (filter.enabled = checked)}>
 	<RangeInputs
 		min={filter.min}
 		max={filter.max}
