@@ -7,6 +7,10 @@
 	import ToggleFilter from './ToggleFilter.svelte';
 	import type { FilterConfig } from '../types/filters';
 
+	function uuid() {
+		return Math.random().toString(36).substring(2, 15);
+	}
+
 	export let title: string;
 	export let enabled: boolean = true;
 	export let filters: FilterConfig[] = [];
@@ -14,25 +18,43 @@
 	const filterId = `filter-group-${title.toLowerCase().replace(/\s+/g, '-')}`;
 	let filterContainer: HTMLDivElement;
 
-	$: if (filterContainer) {
-		const checkboxes = Array.from(filterContainer.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[];
-		checkboxes.forEach(checkbox => {
-			// Update each checkbox that isn't disabled (locked)
-			if (!checkbox.disabled && checkbox !== document.activeElement) {
-				checkbox.checked = enabled;
-				checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-			}
-		});
+	// Handle initial state and filter changes
+	$: {
+		if (filterContainer && filters) {
+			setTimeout(() => {
+				const groupCheckbox = filterContainer.parentElement?.querySelector(':scope > div > div > input[type="checkbox"]') as HTMLInputElement;
+				const childCheckboxes = Array.from(filterContainer.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[];
+				
+				if (groupCheckbox) {
+					// If group isn't locked and filters just changed, set it to checked by default
+					if (!groupCheckbox.disabled && filters) {
+						enabled = true;
+						groupCheckbox.checked = true;
+						groupCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+					}
+
+					childCheckboxes.forEach(checkbox => {
+						if (!checkbox.disabled && checkbox.checked !== groupCheckbox.checked) {
+							checkbox.checked = groupCheckbox.checked;
+							checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+						}
+					});
+				}
+			}, 0);
+		}
 	}
 
-	// Set non-locked group checkboxes to checked when filters change
-	$: if (filters && filterContainer) {
-		const groupCheckbox = filterContainer.parentElement?.querySelector(':scope > div > div > input[type="checkbox"]') as HTMLInputElement;
-		if (groupCheckbox && !groupCheckbox.disabled) {
-			enabled = true;
-			groupCheckbox.checked = true;
-			groupCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
-		}
+	// Handle runtime changes to enabled state
+	$: if (filterContainer) {
+		setTimeout(() => {
+			const childCheckboxes = Array.from(filterContainer.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[];
+			childCheckboxes.forEach(checkbox => {
+				if (!checkbox.disabled && checkbox.checked !== enabled) {
+					checkbox.checked = enabled;
+					checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+				}
+			});
+		}, 0);
 	}
 </script>
 
@@ -46,7 +68,7 @@
 	</div>
 	
 	<div bind:this={filterContainer}>
-		{#each filters as filter}
+		{#each filters as filter (uuid())}
 			{#if filter.rangeFilter}
 				<RangeFilterInput bind:filter={filter.rangeFilter} label={filter.label} />
 			{:else if filter.statFilter}

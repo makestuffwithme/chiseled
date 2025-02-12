@@ -7,11 +7,10 @@
 	$: {
 		const savedState = localStorage.getItem(`filter-lock-${id}`);
 		if (savedState) {
-			const state = JSON.parse(savedState);
-			locked = state.locked;
-			if (locked) {
-				checked = state.checkedState;
-			}
+			locked = true;
+			checked = JSON.parse(savedState);
+		} else {
+			locked = false;
 		}
 	}
 
@@ -19,13 +18,7 @@
 		locked = !locked;
 		if (locked) {
 			// Save state when locking
-			localStorage.setItem(
-				`filter-lock-${id}`,
-				JSON.stringify({
-					locked: true,
-					checkedState: checked
-				})
-			);
+			localStorage.setItem(`filter-lock-${id}`, JSON.stringify(checked));
 		} else {
 			// Clear state when unlocking
 			localStorage.removeItem(`filter-lock-${id}`);
@@ -57,12 +50,7 @@
 				<rect x="3" y="7" width="10" height="7" rx="1" pointer-events="none" />
 				<path d="M5 7V5a3 3 0 0 1 6 0" pointer-events="none" />
 			{/if}
-		</svg></button
-	>
-	<input
-		type="checkbox"
-		class="w-4 h-4 rounded border-gray-300"
-		bind:checked
-		disabled={locked}
-	/>
+		</svg>
+	</button>
+	<input type="checkbox" class="w-4 h-4 rounded border-gray-300" bind:checked disabled={locked} />
 </div>

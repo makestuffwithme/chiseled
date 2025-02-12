@@ -5,14 +5,9 @@
 	import { getCurrentWindow } from '@tauri-apps/api/window';
 	import { PhysicalSize, PhysicalPosition } from '@tauri-apps/api/window';
 	import { message } from '@tauri-apps/plugin-dialog';
-	import RangeFilterInput from './components/RangeFilter.svelte';
-	import StatFilterInput from './components/StatFilter.svelte';
-	import TextFilterInput from './components/TextFilter.svelte';
-	import PriceFilterInput from './components/PriceFilter.svelte';
-	import ToggleFilter from './components/ToggleFilter.svelte';
 	import FilterGroup from './components/FilterGroup.svelte';
 	import SearchResults from './components/SearchResults.svelte';
-	import type { TradeFilters, StatValue, RangeFilter, TextFilter, StatFilter, PriceFilter } from './types/filters';
+	import type { TradeFilters } from './types/filters';
 
 	let searchResults: any = null;
 	let isLoading = false;
