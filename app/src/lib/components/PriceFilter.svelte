@@ -1,13 +1,9 @@
 <script lang="ts">
 	import RangeInputs from './RangeInputs.svelte';
 	import FilterRow from './FilterRow.svelte';
+	import type { PriceFilter } from '../types/filters';
 
-	export let filter: {
-		enabled: boolean;
-		option: string;
-		min: number | null;
-		max: number | null;
-	};
+	export let filter: PriceFilter;
 
 	const options = [
 		{ value: '', label: 'Exalted Orb Equivalent' },

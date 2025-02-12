@@ -1,10 +1,8 @@
 <script lang="ts">
 	import FilterRow from './FilterRow.svelte';
+	import type { TextFilter } from '../types/filters';
 
-	export let filter: {
-		text: string;
-		enabled: boolean;
-	};
+	export let filter: TextFilter;
 	export let label: string;
 	export let options: { value: string; label: string }[] | undefined = undefined;
 	export let readonly = false;

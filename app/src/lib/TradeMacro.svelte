@@ -12,56 +12,7 @@
 	import ToggleFilter from './components/ToggleFilter.svelte';
 	import FilterGroup from './components/FilterGroup.svelte';
 	import SearchResults from './components/SearchResults.svelte';
-
-	interface StatValue {
-		min: number | null;
-		max: number | null;
-	}
-
-	interface RangeFilter {
-		min: number | null;
-		max: number | null;
-		enabled: boolean;
-	}
-
-	interface TextFilter {
-		text: string;
-		enabled: boolean;
-	}
-
-	interface StatFilter {
-		id: string;
-		text: string;
-		enabled: boolean;
-		value: StatValue;
-	}
-
-	interface PriceFilter {
-		enabled: boolean;
-		option: string;
-		min: number | null;
-		max: number | null;
-	}
-
-	interface TradeFilters {
-		item_category: TextFilter | null;
-		item_name: TextFilter | null;
-		item_base_type: TextFilter | null;
-		rarity: TextFilter | null;
-		item_level: RangeFilter | null;
-		physical_dps: RangeFilter | null;
-		elemental_dps: RangeFilter | null;
-		total_dps: RangeFilter | null;
-		attack_speed: RangeFilter | null;
-		critical_chance: RangeFilter | null;
-		socket_count: RangeFilter | null;
-		explicit_mods: StatFilter[];
-		implicit_mods: StatFilter[];
-		rune_mods: StatFilter[];
-		price: PriceFilter;
-		listed_time: string | null;
-		online_only: boolean;
-	}
+	import type { TradeFilters, StatValue, RangeFilter, TextFilter, StatFilter, PriceFilter } from './types/filters';
 
 	let searchResults: any = null;
 	let isLoading = false;
@@ -157,13 +108,13 @@
 	{:else}
 		<div class="p-4 pt-1">
 			{#if filters}
-				<FilterGroup title="Item Filters">
-					<!-- Item Category -->
-					{#if filters.item_category}
-						<TextFilterInput
-							filter={filters.item_category}
-							label="Item Category"
-							options={[
+				<FilterGroup 
+					title="Item Filters"
+					filters={[
+						filters.item_category && {
+							label: "Item Category",
+							textFilter: filters.item_category,
+							options: [
 								// One-Handed Weapons
 								{ value: 'weapon.claw', label: 'Claw' },
 								{ value: 'weapon.dagger', label: 'Dagger' },
@@ -231,117 +182,115 @@
 								{ value: 'currency.omen', label: 'Omen' },
 								{ value: 'currency.rune', label: 'Rune' },
 								{ value: 'currency.soulcore', label: 'Soul Core' }
-							]}
-						/>
-					{/if}
+							]
+						},
+						filters.item_name && {
+							label: "Item Name",
+							textFilter: filters.item_name,
+							readonly: true
+						},
+						filters.item_base_type && {
+							label: "Base Type",
+							textFilter: filters.item_base_type,
+							readonly: true
+						},
+						filters.rarity && {
+							label: "Rarity",
+							textFilter: filters.rarity,
+							options: [
+								{ value: "", label: "Any Rarity"},
+								{ value: "unique", label: "Unique"},
+								{ value: "rare", label: "Rare"},
+								{ value: "magic", label: "Magic"},
+								{ value: "normal", label: "Normal"},
+								{ value: "nonunique", label: "Any Non-Unique"},
+							]
+						},
+						filters.item_level && {
+							label: "Item Level",
+							rangeFilter: filters.item_level
+						},
+						filters.socket_count && {
+							label: "Socket Count",
+							rangeFilter: filters.socket_count
+						}
+					].filter((f): f is NonNullable<typeof f> => Boolean(f))}
+				/>
 
-					<!-- Item Name -->
-					{#if filters.item_name}
-						<TextFilterInput
-							filter={filters.item_name}
-							label="Item Name"
-							readonly={true}
-						/>
-					{/if}
-
-					<!-- Base Type -->
-					{#if filters.item_base_type}
-						<TextFilterInput
-							filter={filters.item_base_type}
-							label="Base Type"
-							readonly={true}
-						/>
-					{/if}
-
-					<!-- Rarity Filter -->
-					{#if filters.rarity}
-						<TextFilterInput filter={filters.rarity} label="Rarity" options={[
-							{ value: "", label: "Any Rarity"},
-							{ value: "unique", label: "Unique"},
-							{ value: "rare", label: "Rare"},
-							{ value: "magic", label: "Magic"},
-							{ value: "normal", label: "Normal"},
-							{ value: "nonunique", label: "Any Non-Unique"},
-						]} />
-					{/if}
-
-					<!-- Item Level Filter -->
-					{#if filters.item_level}
-						<RangeFilterInput filter={filters.item_level} label="Item Level" />
-					{/if}
-
-					<!-- Socket Count Filter -->
-					{#if filters.socket_count}
-						<RangeFilterInput filter={filters.socket_count} label="Socket Count" />
-					{/if}
-				</FilterGroup>
-
-				<!-- Damage Filters -->
 				{#if filters.attack_speed || filters.physical_dps || filters.elemental_dps || filters.total_dps || filters.critical_chance}
-					<FilterGroup title="Damage Filters">
-						<!-- Attack Speed Filter -->
-						{#if filters.attack_speed}
-							<RangeFilterInput filter={filters.attack_speed} label="Attacks per Second" />
-						{/if}
-
-						<!-- DPS Filters -->
-						{#if filters.physical_dps || filters.elemental_dps || filters.total_dps}
-							{#if filters.physical_dps}
-								<RangeFilterInput filter={filters.physical_dps} label="Physical DPS" />
-							{/if}
-							{#if filters.elemental_dps}
-								<RangeFilterInput filter={filters.elemental_dps} label="Elemental DPS" />
-							{/if}
-							{#if filters.total_dps}
-								<RangeFilterInput filter={filters.total_dps} label="Total DPS" />
-							{/if}
-						{/if}
-
-						<!-- Critical Chance Filter -->
-						{#if filters.critical_chance}
-							<RangeFilterInput filter={filters.critical_chance} label="Critical Hit Chance" />
-						{/if}
-					</FilterGroup>
+					<FilterGroup 
+						title="Damage Filters"
+						filters={[
+							filters.attack_speed && {
+								label: "Attacks per Second",
+								rangeFilter: filters.attack_speed
+							},
+							filters.physical_dps && {
+								label: "Physical DPS",
+								rangeFilter: filters.physical_dps
+							},
+							filters.elemental_dps && {
+								label: "Elemental DPS",
+								rangeFilter: filters.elemental_dps
+							},
+							filters.total_dps && {
+								label: "Total DPS",
+								rangeFilter: filters.total_dps
+							},
+							filters.critical_chance && {
+								label: "Critical Hit Chance",
+								rangeFilter: filters.critical_chance
+							}
+						].filter((f): f is NonNullable<typeof f> => Boolean(f))}
+					/>
 				{/if}
 
-				<!-- Explicit Mods -->
 				{#if filters.explicit_mods.length > 0}
-					<FilterGroup title="Explicit Mods">
-						{#each filters.explicit_mods as mod}
-							<StatFilterInput filter={mod} />
-						{/each}
-					</FilterGroup>
+					<FilterGroup 
+						title="Explicit Mods"
+						filters={filters.explicit_mods.map(mod => ({
+							label: mod.text,
+							statFilter: mod
+						}))}
+					/>
 				{/if}
 
-				<!-- Implicit Mods -->
 				{#if filters.implicit_mods.length > 0}
-					<FilterGroup title="Implicit Mods">
-						{#each filters.implicit_mods as mod}
-							<StatFilterInput filter={mod} />
-						{/each}
-					</FilterGroup>
+					<FilterGroup 
+						title="Implicit Mods"
+						filters={filters.implicit_mods.map(mod => ({
+							label: mod.text,
+							statFilter: mod
+						}))}
+					/>
 				{/if}
 
-				<!-- Rune Mods -->
 				{#if filters.rune_mods.length > 0}
-					<FilterGroup title="Rune Mods">
-						{#each filters.rune_mods as mod}
-							<StatFilterInput filter={mod} />
-						{/each}
-					</FilterGroup>
+					<FilterGroup 
+						title="Rune Mods"
+						filters={filters.rune_mods.map(mod => ({
+							label: mod.text,
+							statFilter: mod
+						}))}
+					/>
 				{/if}
 
-				<!-- Price Filter -->
-				<FilterGroup title="Trade Filters">
-					<ToggleFilter
-						checked={filters!.online_only}
-						label="Online Only"
-					/>
-
-					<PriceFilterInput
-						filter={filters!.price}
-					/>
-				</FilterGroup>
+				<FilterGroup 
+					title="Trade Filters"
+					filters={[
+						{
+							label: "Online Only",
+							toggleFilter: {
+								enabled: filters.online_only,
+								label: "Online Only"
+							}
+						},
+						{
+							label: "Price",
+							priceFilter: filters.price
+						}
+					]}
+				/>
 
 				<button
 					class="px-4 py-2 w-full bg-primary text-white rounded hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed"

@@ -1,16 +1,9 @@
 <script lang="ts">
 	import RangeInputs from './RangeInputs.svelte';
 	import FilterRow from './FilterRow.svelte';
+	import type { StatFilter } from '../types/filters';
 
-	export let filter: {
-		id: string;
-		text: string;
-		enabled: boolean;
-		value: {
-			min: number | null;
-			max: number | null;
-		};
-	};
+	export let filter: StatFilter;
 
 	const filterId = `stat-filter-${filter.id}`;
 

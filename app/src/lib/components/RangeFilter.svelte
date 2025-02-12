@@ -1,12 +1,9 @@
 <script lang="ts">
 	import RangeInputs from './RangeInputs.svelte';
 	import FilterRow from './FilterRow.svelte';
+	import type { RangeFilter } from '../types/filters';
 
-	export let filter: {
-		min: number | null;
-		max: number | null;
-		enabled: boolean;
-	};
+	export let filter: RangeFilter;
 	export let label: string;
 
 	const filterId = `range-filter-${label.toLowerCase().replace(/\s+/g, '-')}`;
