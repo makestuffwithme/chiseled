@@ -1,7 +1,6 @@
 <script lang="ts">
-	export let checked: boolean = false;
+	export let checked: boolean;
 	export let locked: boolean = false;
-	export let onChange: (checked: boolean) => void = () => {};
 	export let id: string;
 
 	// Load initial locked state and saved checked state from localStorage
@@ -12,15 +11,7 @@
 			locked = state.locked;
 			if (locked) {
 				checked = state.checkedState;
-				onChange(checked);
 			}
-		}
-	}
-
-	function handleChange(e: Event) {
-		const target = e.target as HTMLInputElement;
-		if (!locked) {
-			onChange(target.checked);
 		}
 	}
 
@@ -44,7 +35,7 @@
 
 <div class="flex items-center gap-1">
 	<button
-		class="{locked ? 'text-gray-300' : 'text-gray-400'} hover:text-gray-300 transition-colors"
+		class="{locked ? 'text-gray-300' : 'text-gray-500'} hover:text-gray-300 transition-colors"
 		on:click={toggleLock}
 		title={locked ? 'Unlock' : 'Lock'}
 	>
@@ -72,7 +63,6 @@
 		type="checkbox"
 		class="w-4 h-4 rounded border-gray-300"
 		bind:checked
-		on:change={handleChange}
 		disabled={locked}
 	/>
 </div>

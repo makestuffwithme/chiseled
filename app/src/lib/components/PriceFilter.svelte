@@ -13,33 +13,20 @@
 	];
 
 	const filterId = 'price-filter';
-
-	function updateFilter(key: 'min' | 'max', newValue: string) {
-		filter[key] = newValue === '' ? null : Number(newValue);
-		filter = filter;
-	}
 </script>
 
 <FilterRow
-	enabled={filter.enabled}
+	bind:enabled={filter.enabled}
 	label="Price"
 	id={filterId}
-	onToggle={(value) => {
-		filter.enabled = value;
-		filter = filter;
-	}}
 >
 	<RangeInputs
-		min={filter.min}
-		max={filter.max}
-		disabled={!filter.enabled}
-		onMinChange={(v) => updateFilter('min', v)}
-		onMaxChange={(v) => updateFilter('max', v)}
+		bind:min={filter.min}
+		bind:max={filter.max}
 	/>
 	<select
 		class="p-0.5 bg-surface-dark border-border border rounded text-text disabled:opacity-50"
 		bind:value={filter.option}
-		disabled={!filter.enabled}
 	>
 		{#each options as option}
 			<option value={option.value}>{option.label}</option>

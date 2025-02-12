@@ -11,58 +11,61 @@
 	export let enabled: boolean = true;
 	export let filters: FilterConfig[] = [];
 
-	let groupDiv: HTMLElement;
 	const filterId = `filter-group-${title.toLowerCase().replace(/\s+/g, '-')}`;
+	let filterContainer: HTMLDivElement;
 
-	function handleGroupToggle(checked: boolean) {
-		enabled = checked;
-		
-		// Update all filters in the group
-		if (checked !== enabled) {
-			filters.forEach(filter => {
-				if (filter.rangeFilter) filter.rangeFilter.enabled = checked;
-				if (filter.statFilter) filter.statFilter.enabled = checked;
-				if (filter.textFilter) filter.textFilter.enabled = checked;
-				if (filter.priceFilter) filter.priceFilter.enabled = checked;
-				if (filter.toggleFilter) filter.toggleFilter.enabled = checked;
-			});
+	$: if (filterContainer) {
+		const checkboxes = Array.from(filterContainer.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[];
+		checkboxes.forEach(checkbox => {
+			// Update each checkbox that isn't disabled (locked)
+			if (!checkbox.disabled && checkbox !== document.activeElement) {
+				checkbox.checked = enabled;
+				checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+			}
+		});
+	}
+
+	// Set non-locked group checkboxes to checked when filters change
+	$: if (filters && filterContainer) {
+		const groupCheckbox = filterContainer.parentElement?.querySelector(':scope > div > div > input[type="checkbox"]') as HTMLInputElement;
+		if (groupCheckbox && !groupCheckbox.disabled) {
+			enabled = true;
+			groupCheckbox.checked = true;
+			groupCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
 		}
 	}
 </script>
 
-<div 
-	class="mb-2 px-2 pt-1 pb-2 bg-surface rounded shadow border border-border"
-	bind:this={groupDiv}
->
+<div class="mb-2 px-2 py-1 bg-surface rounded shadow border border-border" >
 	<div class="flex items-center gap-2 mb-1">
 		<LockableCheckbox
-			checked={enabled}
-			onChange={handleGroupToggle}
+			bind:checked={enabled}
 			id={filterId}
 		/>
 		<h4 class="text-text capitalize font-semibold">{title}</h4>
 	</div>
 	
-	{#each filters as filter}
-		{#if filter.rangeFilter}
-			<RangeFilterInput filter={filter.rangeFilter} label={filter.label} />
-		{:else if filter.statFilter}
-			<StatFilterInput filter={filter.statFilter} />
-		{:else if filter.textFilter}
-			<TextFilterInput 
-				filter={filter.textFilter} 
-				label={filter.label}
-				options={filter.options}
-				readonly={filter.readonly}
-			/>
-		{:else if filter.priceFilter}
-			<PriceFilterInput filter={filter.priceFilter} />
-		{:else if filter.toggleFilter}
-			<ToggleFilter 
-				checked={filter.toggleFilter.enabled}
-				label={filter.toggleFilter.label}
-				onToggle={(checked) => filter.toggleFilter!.enabled = checked}
-			/>
-		{/if}
-	{/each}
+	<div bind:this={filterContainer}>
+		{#each filters as filter}
+			{#if filter.rangeFilter}
+				<RangeFilterInput bind:filter={filter.rangeFilter} label={filter.label} />
+			{:else if filter.statFilter}
+				<StatFilterInput bind:filter={filter.statFilter} />
+			{:else if filter.textFilter}
+				<TextFilterInput 
+					bind:filter={filter.textFilter} 
+					label={filter.label}
+					options={filter.options}
+					readonly={filter.readonly}
+				/>
+			{:else if filter.priceFilter}
+				<PriceFilterInput bind:filter={filter.priceFilter} />
+			{:else if filter.toggleFilter}
+				<ToggleFilter 
+					bind:checked={filter.toggleFilter.enabled}
+					label={filter.toggleFilter.label}
+				/>
+			{/if}
+		{/each}
+	</div>
 </div>

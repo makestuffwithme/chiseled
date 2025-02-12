@@ -106,7 +106,7 @@
 			</div>
 		</div>
 	{:else}
-		<div class="p-4 pt-1">
+		<div class="p-2 pt-1">
 			{#if filters}
 				<FilterGroup 
 					title="Item Filters"

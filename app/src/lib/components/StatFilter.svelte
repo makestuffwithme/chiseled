@@ -6,24 +6,15 @@
 	export let filter: StatFilter;
 
 	const filterId = `stat-filter-${filter.id}`;
-
-	function updateFilter(key: 'min' | 'max', newValue: string) {
-		filter.value[key] = newValue === '' ? null : Number(newValue);
-		filter = filter;
-	}
 </script>
 
 <FilterRow
-	enabled={filter.enabled}
+	bind:enabled={filter.enabled}
 	label={filter.text}
 	id={filterId}
-	onToggle={(checked) => (filter.enabled = checked)}
 >
 	<RangeInputs
-		min={filter.value.min}
-		max={filter.value.max}
-		disabled={!filter.enabled}
-		onMinChange={(v) => updateFilter('min', v)}
-		onMaxChange={(v) => updateFilter('max', v)}
+		bind:min={filter.value.min}
+		bind:max={filter.value.max}
 	/>
 </FilterRow>

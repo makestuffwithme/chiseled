@@ -7,19 +7,11 @@
 	export let label: string;
 
 	const filterId = `range-filter-${label.toLowerCase().replace(/\s+/g, '-')}`;
-
-	function updateFilter(key: 'min' | 'max', newValue: string) {
-		filter[key] = newValue === '' ? null : Number(newValue);
-		filter = filter;
-	}
 </script>
 
-<FilterRow enabled={filter.enabled} {label} id={filterId} onToggle={(checked) => (filter.enabled = checked)}>
+<FilterRow bind:enabled={filter.enabled} {label} id={filterId}>
 	<RangeInputs
-		min={filter.min}
-		max={filter.max}
-		disabled={!filter.enabled}
-		onMinChange={(v) => updateFilter('min', v)}
-		onMaxChange={(v) => updateFilter('max', v)}
+		bind:min={filter.min}
+		bind:max={filter.max}
 	/>
 </FilterRow>

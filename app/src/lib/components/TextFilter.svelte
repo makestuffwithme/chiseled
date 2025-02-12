@@ -8,19 +8,14 @@
 	export let readonly = false;
 
 	const filterId = `text-filter-${label.toLowerCase().replace(/\s+/g, '-')}`;
-
-	function updateFilter(newValue: string) {
-		filter.text = newValue;
-		filter = filter;
-	}
 </script>
 
-<FilterRow enabled={filter.enabled} {label} id={filterId} onToggle={(value) => (filter.enabled = value)}>
+<FilterRow bind:enabled={filter.enabled} {label} id={filterId}>
 	{#if options}
 		<select
 			class="p-0 bg-surface-dark border-border border rounded text-text disabled:opacity-50"
 			bind:value={filter.text}
-			disabled={!filter.enabled}
+			disabled={readonly}
 		>
 			{#each options as option}
 				<option value={option.value}>{option.label}</option>
@@ -30,9 +25,8 @@
 		<input
 			type="text"
 			class="p-0 px-1 bg-surface-dark border-border border rounded text-text disabled:opacity-50"
-			value={filter.text}
-			on:input={(e) => updateFilter(e.currentTarget.value)}
-			disabled={!filter.enabled || readonly}
+			bind:value={filter.text}
+			disabled={readonly}
 		/>
 	{/if}
 </FilterRow>
