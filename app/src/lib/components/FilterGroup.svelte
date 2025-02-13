@@ -26,15 +26,8 @@
 				const childCheckboxes = Array.from(filterContainer.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[];
 				
 				if (groupCheckbox) {
-					// If group isn't locked and filters just changed, set it to checked by default
-					if (!groupCheckbox.disabled && filters) {
-						enabled = true;
-						groupCheckbox.checked = true;
-						groupCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
-					}
-
 					childCheckboxes.forEach(checkbox => {
-						if (!checkbox.disabled && checkbox.checked !== groupCheckbox.checked) {
+						if (!checkbox.readOnly && checkbox.checked !== groupCheckbox.checked) {
 							checkbox.checked = groupCheckbox.checked;
 							checkbox.dispatchEvent(new Event('change', { bubbles: true }));
 						}
@@ -49,7 +42,7 @@
 		setTimeout(() => {
 			const childCheckboxes = Array.from(filterContainer.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[];
 			childCheckboxes.forEach(checkbox => {
-				if (!checkbox.disabled && checkbox.checked !== enabled) {
+				if (!checkbox.readOnly && checkbox.checked !== enabled) {
 					checkbox.checked = enabled;
 					checkbox.dispatchEvent(new Event('change', { bubbles: true }));
 				}

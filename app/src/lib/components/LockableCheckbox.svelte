@@ -3,26 +3,25 @@
 	export let locked: boolean = false;
 	export let id: string;
 
-	// Load initial locked state and saved checked state from localStorage
+	// Only load initial state on component mount
+	const savedState = localStorage.getItem(`filter-lock-${id}`);
+	if (savedState !== null) {
+		console.log(`[${id}] Initial load - setting from storage:`, savedState);
+		locked = true;
+		checked = savedState === 'true';
+	}
+
+	// Handle changes to locked state
 	$: {
-		const savedState = localStorage.getItem(`filter-lock-${id}`);
-		if (savedState) {
-			locked = true;
-			checked = JSON.parse(savedState);
+		if (locked) {
+			localStorage.setItem(`filter-lock-${id}`, checked.toString());
 		} else {
-			locked = false;
+			localStorage.removeItem(`filter-lock-${id}`);
 		}
 	}
 
 	function toggleLock() {
 		locked = !locked;
-		if (locked) {
-			// Save state when locking
-			localStorage.setItem(`filter-lock-${id}`, JSON.stringify(checked));
-		} else {
-			// Clear state when unlocking
-			localStorage.removeItem(`filter-lock-${id}`);
-		}
 	}
 </script>
 
@@ -54,3 +53,10 @@
 	</button>
 	<input type="checkbox" class="w-4 h-4 rounded border-gray-300" bind:checked disabled={locked} />
 </div>
+
+<!-- you cant style a disabled checkbox (ffs), but you can apply a filter -->
+<style>
+	input[type='checkbox'][disabled] {
+		filter: invert(100%) hue-rotate(9deg) brightness(4);
+	}
+</style>
