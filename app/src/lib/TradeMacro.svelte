@@ -15,6 +15,7 @@
 	let filters: TradeFilters | null = null;
 	let hasBeenResized = false;
 	let keydownHandler: (event: KeyboardEvent) => Promise<void>;
+	let uuid = crypto.randomUUID();
 
 	onMount(async () => {
 		keydownHandler = async (event: KeyboardEvent) => {
@@ -53,6 +54,8 @@
 				error = null;
 				isLoading = false;
 				filters = parsedFilters;
+				// we use a uuid here to guarantee a fresh form each time we get new filters
+				uuid = crypto.randomUUID();
 			} catch (err) {
 				console.error('Error parsing filters:', err);
 				error = err instanceof Error ? err.message : 'Error parsing filters';
@@ -102,7 +105,7 @@
 		</div>
 	{:else}
 		<div class="p-2 pt-1">
-			{#if filters}
+			{#key uuid}
 				<FilterGroup 
 					title="Item Filters"
 					filters={[
@@ -294,7 +297,7 @@
 				>
 					{isLoading ? 'Searching...' : 'Search Trade'}
 				</button>
-			{/if}
+			{/key}
 
 			<div class="mt-2">
 				{#if error}

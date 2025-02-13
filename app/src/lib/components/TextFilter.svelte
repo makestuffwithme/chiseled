@@ -6,11 +6,12 @@
 	export let label: string;
 	export let options: { value: string; label: string }[] | undefined = undefined;
 	export let readonly = false;
+	export let groupEnabled: boolean | undefined = undefined;
 
 	const filterId = `text-filter-${label.toLowerCase().replace(/\s+/g, '-')}`;
 </script>
 
-<FilterRow bind:enabled={filter.enabled} {label} id={filterId}>
+<FilterRow bind:enabled={filter.enabled} {label} id={filterId} bind:groupEnabled>
 	{#if options}
 		<select
 			class="p-0 bg-surface-dark border-border border rounded text-text disabled:opacity-50"

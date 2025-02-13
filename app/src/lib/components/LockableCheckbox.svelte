@@ -2,6 +2,8 @@
 	export let checked: boolean;
 	export let locked: boolean = false;
 	export let id: string;
+	export let groupEnabled: boolean | undefined = undefined;
+	export let onChange: (value: boolean) => void = () => {};
 
 	// Only load initial state on component mount
 	const savedState = localStorage.getItem(`filter-lock-${id}`);
@@ -11,17 +13,30 @@
 		checked = savedState === 'true';
 	}
 
-	// Handle changes to locked state
+	// Handle parent group state changes
 	$: {
+		if (groupEnabled !== undefined && !locked) {
+			updateChecked(groupEnabled);
+		}
+	}
+
+	function updateChecked(value: boolean) {
+		checked = value;
+		onChange(value);
+	}
+
+	function handleChange(event: Event) {
+		const target = event.target as HTMLInputElement;
+		updateChecked(target.checked);
+	}
+
+	function toggleLock() {
+		locked = !locked;
 		if (locked) {
 			localStorage.setItem(`filter-lock-${id}`, checked.toString());
 		} else {
 			localStorage.removeItem(`filter-lock-${id}`);
 		}
-	}
-
-	function toggleLock() {
-		locked = !locked;
 	}
 </script>
 
@@ -51,7 +66,13 @@
 			{/if}
 		</svg>
 	</button>
-	<input type="checkbox" class="w-4 h-4 rounded border-gray-300" bind:checked disabled={locked} />
+	<input 
+		type="checkbox" 
+		class="w-4 h-4 rounded border-gray-300" 
+		{checked}
+		on:change={handleChange}
+		disabled={locked} 
+	/>
 </div>
 
 <!-- you cant style a disabled checkbox (ffs), but you can apply a filter -->

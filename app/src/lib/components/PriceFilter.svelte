@@ -4,6 +4,7 @@
 	import type { PriceFilter } from '../types/filters';
 
 	export let filter: PriceFilter;
+	export let groupEnabled: boolean | undefined = undefined;
 
 	const options = [
 		{ value: '', label: 'Exalted Orb Equivalent' },
@@ -19,6 +20,7 @@
 	bind:enabled={filter.enabled}
 	label="Price"
 	id={filterId}
+	bind:groupEnabled
 >
 	<RangeInputs
 		bind:min={filter.min}

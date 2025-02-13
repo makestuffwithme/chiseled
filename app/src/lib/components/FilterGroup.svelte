@@ -7,48 +7,11 @@
 	import ToggleFilter from './ToggleFilter.svelte';
 	import type { FilterConfig } from '../types/filters';
 
-	function uuid() {
-		return Math.random().toString(36).substring(2, 15);
-	}
-
 	export let title: string;
 	export let enabled: boolean = true;
 	export let filters: FilterConfig[] = [];
 
 	const filterId = `filter-group-${title.toLowerCase().replace(/\s+/g, '-')}`;
-	let filterContainer: HTMLDivElement;
-
-	// Handle initial state and filter changes
-	$: {
-		if (filterContainer && filters) {
-			setTimeout(() => {
-				const groupCheckbox = filterContainer.parentElement?.querySelector(':scope > div > div > input[type="checkbox"]') as HTMLInputElement;
-				const childCheckboxes = Array.from(filterContainer.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[];
-				
-				if (groupCheckbox) {
-					childCheckboxes.forEach(checkbox => {
-						if (!checkbox.readOnly && checkbox.checked !== groupCheckbox.checked) {
-							checkbox.checked = groupCheckbox.checked;
-							checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-						}
-					});
-				}
-			}, 0);
-		}
-	}
-
-	// Handle runtime changes to enabled state
-	$: if (filterContainer) {
-		setTimeout(() => {
-			const childCheckboxes = Array.from(filterContainer.querySelectorAll('input[type="checkbox"]')) as HTMLInputElement[];
-			childCheckboxes.forEach(checkbox => {
-				if (!checkbox.readOnly && checkbox.checked !== enabled) {
-					checkbox.checked = enabled;
-					checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-				}
-			});
-		}, 0);
-	}
 </script>
 
 <div class="mb-2 px-2 py-1 bg-surface rounded shadow border border-border" >
@@ -60,25 +23,27 @@
 		<h4 class="text-text capitalize font-semibold">{title}</h4>
 	</div>
 	
-	<div bind:this={filterContainer}>
-		{#each filters as filter (uuid())}
+	<div>
+		{#each filters as filter}
 			{#if filter.rangeFilter}
-				<RangeFilterInput bind:filter={filter.rangeFilter} label={filter.label} />
+				<RangeFilterInput bind:filter={filter.rangeFilter} label={filter.label} groupEnabled={enabled} />
 			{:else if filter.statFilter}
-				<StatFilterInput bind:filter={filter.statFilter} />
+				<StatFilterInput bind:filter={filter.statFilter} groupEnabled={enabled} />
 			{:else if filter.textFilter}
 				<TextFilterInput 
 					bind:filter={filter.textFilter} 
 					label={filter.label}
 					options={filter.options}
 					readonly={filter.readonly}
+					groupEnabled={enabled}
 				/>
 			{:else if filter.priceFilter}
-				<PriceFilterInput bind:filter={filter.priceFilter} />
+				<PriceFilterInput bind:filter={filter.priceFilter} groupEnabled={enabled} />
 			{:else if filter.toggleFilter}
 				<ToggleFilter 
 					bind:checked={filter.toggleFilter.enabled}
 					label={filter.toggleFilter.label}
+					groupEnabled={enabled}
 				/>
 			{/if}
 		{/each}

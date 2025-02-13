@@ -4,6 +4,7 @@
 	import type { StatFilter } from '../types/filters';
 
 	export let filter: StatFilter;
+	export let groupEnabled: boolean | undefined = undefined;
 
 	const filterId = `stat-filter-${filter.id}`;
 </script>
@@ -12,6 +13,7 @@
 	bind:enabled={filter.enabled}
 	label={filter.text}
 	id={filterId}
+	bind:groupEnabled
 >
 	<RangeInputs
 		bind:min={filter.value.min}
