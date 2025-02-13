@@ -243,6 +243,26 @@
 					/>
 				{/if}
 
+				{#if filters.armour || filters.energy_shield || filters.evasion}
+					<FilterGroup 
+						title="Armour Filters"
+						filters={[
+							filters.armour && {
+								label: "Armour",
+								rangeFilter: filters.armour
+							},
+							filters.energy_shield && {
+								label: "Energy Shield",
+								rangeFilter: filters.energy_shield
+							},
+							filters.evasion && {
+								label: "Evasion",
+								rangeFilter: filters.evasion
+							}
+						].filter((f): f is NonNullable<typeof f> => Boolean(f))}
+					/>
+				{/if}
+
 				{#if filters.explicit_mods.length > 0}
 					<FilterGroup 
 						title="Explicit Mods"

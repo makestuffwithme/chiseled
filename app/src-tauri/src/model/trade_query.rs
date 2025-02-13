@@ -185,6 +185,26 @@ impl TradeQuery {
             }
         }
 
+        // Add armour filters
+        if let Some(armour) = &filters.armour {
+            if armour.enabled {
+                equipment_filters["ar"] = json!({"min": armour.min, "max": armour.max});
+                has_equipment_filters = true;
+            }
+        }
+        if let Some(es) = &filters.energy_shield {
+            if es.enabled {
+                equipment_filters["es"] = json!({"min": es.min, "max": es.max});
+                has_equipment_filters = true;
+            }
+        }
+        if let Some(evasion) = &filters.evasion {
+            if evasion.enabled {
+                equipment_filters["ev"] = json!({"min": evasion.min, "max": evasion.max});
+                has_equipment_filters = true;
+            }
+        }
+
         if has_equipment_filters {
             query["filters"]["equipment_filters"] = json!({
                 "filters": equipment_filters,
@@ -311,5 +331,61 @@ mod test {
 
         // Check sort
         assert_eq!(query.sort["price"], "asc");
+    }
+
+    #[test]
+    fn test_armour_filters_to_query() {
+        let mut filters = TradeFilters::new();
+        filters.item_category = Some(TextFilter {
+            text: "armour.helmet".to_string(),
+            enabled: true,
+        });
+        filters.online_only = true;
+
+        // Add armour properties
+        filters.armour = Some(RangeFilter {
+            min: Some(44.0),
+            max: None,
+            enabled: true,
+        });
+        filters.energy_shield = Some(RangeFilter {
+            min: Some(19.0),
+            max: None,
+            enabled: true,
+        });
+        filters.evasion = Some(RangeFilter {
+            min: Some(919.0),
+            max: None,
+            enabled: true,
+        });
+
+        let query = TradeQuery::from_trade_filters(&filters);
+
+        // Verify the query structure
+        assert_eq!(query.query["status"]["option"], "online");
+
+        // Check type filters
+        let type_filters = &query.query["filters"]["type_filters"];
+        assert_eq!(type_filters["disabled"], false);
+        assert_eq!(
+            type_filters["filters"]["category"]["option"],
+            "armour.helmet"
+        );
+
+        // Check equipment filters
+        let equipment_filters = &query.query["filters"]["equipment_filters"];
+        assert_eq!(equipment_filters["disabled"], false);
+
+        // Check armour values
+        assert_json_float_eq(&equipment_filters["filters"]["ar"]["min"], 44.0);
+        assert!(equipment_filters["filters"]["ar"]["max"].is_null());
+
+        // Check energy shield values
+        assert_json_float_eq(&equipment_filters["filters"]["es"]["min"], 19.0);
+        assert!(equipment_filters["filters"]["es"]["max"].is_null());
+
+        // Check evasion values
+        assert_json_float_eq(&equipment_filters["filters"]["ev"]["min"], 919.0);
+        assert!(equipment_filters["filters"]["ev"]["max"].is_null());
     }
 }

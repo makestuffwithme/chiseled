@@ -17,6 +17,11 @@ pub struct TradeFilters {
     pub critical_chance: Option<RangeFilter>,
     pub socket_count: Option<RangeFilter>,
 
+    // Armour Properties
+    pub armour: Option<RangeFilter>,
+    pub energy_shield: Option<RangeFilter>,
+    pub evasion: Option<RangeFilter>,
+
     // Stat Filters
     pub explicit_mods: Vec<StatFilter>,
     pub implicit_mods: Vec<StatFilter>,
@@ -169,6 +174,9 @@ impl TradeFilters {
             attack_speed: None,
             critical_chance: None,
             socket_count: None,
+            armour: None,
+            energy_shield: None,
+            evasion: None,
             explicit_mods: Vec::new(),
             implicit_mods: Vec::new(),
             rune_mods: Vec::new(),
@@ -295,6 +303,42 @@ impl TradeFilters {
                     .map_err(|e| format!("Failed to parse item level: {}", e))?;
                 filters.item_level = Some(RangeFilter {
                     min: Some(level),
+                    max: None,
+                    enabled: true,
+                });
+            } else if let Some(armour) = line.strip_prefix("Armour: ") {
+                let armour: f64 = armour
+                    .split_whitespace()
+                    .next()
+                    .unwrap_or("0")
+                    .parse()
+                    .map_err(|e| format!("Failed to parse armour value: {}", e))?;
+                filters.armour = Some(RangeFilter {
+                    min: Some(armour),
+                    max: None,
+                    enabled: true,
+                });
+            } else if let Some(es) = line.strip_prefix("Energy Shield: ") {
+                let es: f64 = es
+                    .split_whitespace()
+                    .next()
+                    .unwrap_or("0")
+                    .parse()
+                    .map_err(|e| format!("Failed to parse energy shield value: {}", e))?;
+                filters.energy_shield = Some(RangeFilter {
+                    min: Some(es),
+                    max: None,
+                    enabled: true,
+                });
+            } else if let Some(evasion) = line.strip_prefix("Evasion Rating: ") {
+                let evasion: f64 = evasion
+                    .split_whitespace()
+                    .next()
+                    .unwrap_or("0")
+                    .parse()
+                    .map_err(|e| format!("Failed to parse evasion rating value: {}", e))?;
+                filters.evasion = Some(RangeFilter {
+                    min: Some(evasion),
                     max: None,
                     enabled: true,
                 });
@@ -603,6 +647,27 @@ Adds 6 to 11 Physical Damage
 Bow Attacks fire an additional Arrow
 Leeches 5.85% of Physical Damage as Mana"#;
 
+    const ARMOUR_TEST_ITEM: &str = r#"Item Class: Helmets
+Rarity: Rare
+Empyrean Dome
+Cultist Crown
+--------
+Armour: 44
+Energy Shield: 19
+Evasion Rating: 919 (augmented)
+--------
+Requirements:
+Level: 16
+Str: 18 (unmet)
+Int: 18
+--------
+Item Level: 17
+--------
+9% increased Rarity of Items found
++1 to Level of all Minion Skills
++5 to Intelligence
++8% to Cold Resistance"#;
+
     #[test]
     fn test_trade_filters_from_text() {
         let (affix_map, base_type_map) = get_test_maps();
@@ -875,5 +940,66 @@ Leeches 5.85% of Physical Damage as Mana"#;
             .expect("Should have mana leech mod");
         assert_eq!(leech_mod.id, "explicit.stat_669069897");
         assert_json_float_eq(&json!(leech_mod.value.min.unwrap()), 5.85);
+    }
+
+    #[test]
+    fn test_armour_with_defensive_stats() {
+        let (affix_map, base_type_map) = get_test_maps();
+        let filters = TradeFilters::from_text(
+            |text, prefix| affix_map.mod_pattern_to_trade_stat(text, prefix),
+            |text| base_type_map.item_text_to_base_type(text),
+            ARMOUR_TEST_ITEM,
+        )
+        .expect("Should parse successfully");
+
+        // Check base properties
+        assert_eq!(
+            filters.item_category,
+            Some(TextFilter {
+                text: "armour.helmet".to_string(),
+                enabled: true,
+            })
+        );
+
+        // Check defensive stats
+        assert_eq!(
+            filters.armour,
+            Some(RangeFilter {
+                min: Some(44.0),
+                max: None,
+                enabled: true,
+            })
+        );
+
+        assert_eq!(
+            filters.energy_shield,
+            Some(RangeFilter {
+                min: Some(19.0),
+                max: None,
+                enabled: true,
+            })
+        );
+
+        assert_eq!(
+            filters.evasion,
+            Some(RangeFilter {
+                min: Some(919.0),
+                max: None,
+                enabled: true,
+            })
+        );
+
+        // Check item level
+        assert_eq!(
+            filters.item_level,
+            Some(RangeFilter {
+                min: Some(17.0),
+                max: None,
+                enabled: true,
+            })
+        );
+
+        // Check explicit mods (just verify count as the actual mod parsing is tested elsewhere)
+        assert_eq!(filters.explicit_mods.len(), 4);
     }
 }

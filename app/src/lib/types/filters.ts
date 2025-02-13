@@ -56,6 +56,12 @@ export interface TradeFilters {
     attack_speed: RangeFilter | null;
     critical_chance: RangeFilter | null;
     socket_count: RangeFilter | null;
+
+    // Armour Properties
+    armour: RangeFilter | null;
+    energy_shield: RangeFilter | null;
+    evasion: RangeFilter | null;
+
     explicit_mods: StatFilter[];
     implicit_mods: StatFilter[];
     rune_mods: StatFilter[];
