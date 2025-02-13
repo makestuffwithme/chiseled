@@ -1,33 +1,22 @@
 <script lang="ts">
 	import RangeInputs from './RangeInputs.svelte';
 	import FilterRow from './FilterRow.svelte';
+	import type { StatFilter } from '../types/filters';
 
-	export let filter: {
-		id: string;
-		text: string;
-		enabled: boolean;
-		value: {
-			min: number | null;
-			max: number | null;
-		};
-	};
+	export let filter: StatFilter;
+	export let groupEnabled: boolean | undefined = undefined;
 
-	function updateFilter(key: 'min' | 'max', newValue: string) {
-		filter.value[key] = newValue === '' ? null : Number(newValue);
-		filter = filter;
-	}
+	const filterId = `stat-filter-${filter.id}`;
 </script>
 
 <FilterRow
-	enabled={filter.enabled}
+	bind:enabled={filter.enabled}
 	label={filter.text}
-	onToggle={(checked) => (filter.enabled = checked)}
+	id={filterId}
+	bind:groupEnabled
 >
 	<RangeInputs
-		min={filter.value.min}
-		max={filter.value.max}
-		disabled={!filter.enabled}
-		onMinChange={(v) => updateFilter('min', v)}
-		onMaxChange={(v) => updateFilter('max', v)}
+		bind:min={filter.value.min}
+		bind:max={filter.value.max}
 	/>
 </FilterRow>

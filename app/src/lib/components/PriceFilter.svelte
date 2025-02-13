@@ -1,13 +1,10 @@
 <script lang="ts">
 	import RangeInputs from './RangeInputs.svelte';
 	import FilterRow from './FilterRow.svelte';
+	import type { PriceFilter } from '../types/filters';
 
-	export let filter: {
-		enabled: boolean;
-		option: string;
-		min: number | null;
-		max: number | null;
-	};
+	export let filter: PriceFilter;
+	export let groupEnabled: boolean | undefined = undefined;
 
 	const options = [
 		{ value: '', label: 'Exalted Orb Equivalent' },
@@ -16,32 +13,22 @@
 		{ value: 'exalted_divine', label: 'Exalted Orbs or Divine Orbs' }
 	];
 
-
-	function updateFilter(key: 'min' | 'max', newValue: string) {
-		filter[key] = newValue === '' ? null : Number(newValue);
-		filter = filter;
-	}
+	const filterId = 'price-filter';
 </script>
 
 <FilterRow
-	enabled={filter.enabled}
+	bind:enabled={filter.enabled}
 	label="Price"
-	onToggle={(value) => {
-		filter.enabled = value;
-		filter = filter;
-	}}
+	id={filterId}
+	bind:groupEnabled
 >
 	<RangeInputs
-		min={filter.min}
-		max={filter.max}
-		disabled={!filter.enabled}
-		onMinChange={(v) => updateFilter('min', v)}
-		onMaxChange={(v) => updateFilter('max', v)}
+		bind:min={filter.min}
+		bind:max={filter.max}
 	/>
 	<select
 		class="p-0.5 bg-surface-dark border-border border rounded text-text disabled:opacity-50"
 		bind:value={filter.option}
-		disabled={!filter.enabled}
 	>
 		{#each options as option}
 			<option value={option.value}>{option.label}</option>

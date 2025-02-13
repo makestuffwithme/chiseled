@@ -1,37 +1,51 @@
 <script lang="ts">
+	import LockableCheckbox from './LockableCheckbox.svelte';
+	import RangeFilterInput from './RangeFilter.svelte';
+	import StatFilterInput from './StatFilter.svelte';
+	import TextFilterInput from './TextFilter.svelte';
+	import PriceFilterInput from './PriceFilter.svelte';
+	import ToggleFilter from './ToggleFilter.svelte';
+	import type { FilterConfig } from '../types/filters';
+
 	export let title: string;
 	export let enabled: boolean = true;
+	export let filters: FilterConfig[] = [];
 
-	let groupDiv: HTMLElement;
-
-	function handleGroupToggle(e: Event) {
-		const checked = (e.target as HTMLInputElement).checked;
-		
-		// Only find checkboxes that are direct children of this group
-		if (groupDiv) {
-			const childCheckboxes = groupDiv.querySelectorAll(':scope > div > label > input[type="checkbox"]');
-			childCheckboxes.forEach(checkbox => {
-				if (checkbox !== e.target) {
-					(checkbox as HTMLInputElement).checked = checked;
-					checkbox.dispatchEvent(new Event('change'));
-				}
-			});
-		}
-	}
+	const filterId = `filter-group-${title.toLowerCase().replace(/\s+/g, '-')}`;
 </script>
 
-<div 
-	class="mb-2 px-2 pt-1 pb-2 bg-surface rounded shadow border border-border"
-	bind:this={groupDiv}
->
+<div class="mb-2 px-2 py-1 bg-surface rounded shadow border border-border" >
 	<div class="flex items-center gap-2 mb-1">
-		<input
-			type="checkbox"
-			class="w-4 h-4 rounded border-gray-300 filter-group-checkbox"
+		<LockableCheckbox
 			bind:checked={enabled}
-			on:change={handleGroupToggle}
+			id={filterId}
 		/>
 		<h4 class="text-text capitalize font-semibold">{title}</h4>
 	</div>
-	<slot />
+	
+	<div>
+		{#each filters as filter}
+			{#if filter.rangeFilter}
+				<RangeFilterInput bind:filter={filter.rangeFilter} label={filter.label} groupEnabled={enabled} />
+			{:else if filter.statFilter}
+				<StatFilterInput bind:filter={filter.statFilter} groupEnabled={enabled} />
+			{:else if filter.textFilter}
+				<TextFilterInput 
+					bind:filter={filter.textFilter} 
+					label={filter.label}
+					options={filter.options}
+					readonly={filter.readonly}
+					groupEnabled={enabled}
+				/>
+			{:else if filter.priceFilter}
+				<PriceFilterInput bind:filter={filter.priceFilter} groupEnabled={enabled} />
+			{:else if filter.toggleFilter}
+				<ToggleFilter 
+					bind:checked={filter.toggleFilter.enabled}
+					label={filter.toggleFilter.label}
+					groupEnabled={enabled}
+				/>
+			{/if}
+		{/each}
+	</div>
 </div>

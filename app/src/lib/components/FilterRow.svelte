@@ -1,18 +1,22 @@
 <script lang="ts">
-	export let enabled: boolean = true;
+	import LockableCheckbox from './LockableCheckbox.svelte';
+	export let enabled: boolean;
 	export let label: string;
-	export let onToggle: (checked: boolean) => void;
+	export let id: string;
+	export let groupEnabled: boolean | undefined = undefined;
+
+	function handleChange(value: boolean) {
+		enabled = value;
+	}
 </script>
 
-<div class="p-0.5">
-	<label class="flex items-center gap-2 text-sm">
-		<input
-			type="checkbox"
-			class="w-4 h-4 rounded border-gray-300"
-			bind:checked={enabled}
-			on:change={(e) => onToggle(e.currentTarget.checked)}
-		/>
-		<slot />
-		<span class="text-text">{label}</span>
-	</label>
+<div class="p-0.5 pl-2 flex items-center gap-2 text-sm">
+	<LockableCheckbox 
+		checked={enabled} 
+		{id} 
+		{groupEnabled}
+		onChange={handleChange}
+	/>
+	<slot />
+	<span class="text-text">{label}</span>
 </div>

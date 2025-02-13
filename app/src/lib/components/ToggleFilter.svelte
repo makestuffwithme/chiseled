@@ -3,6 +3,14 @@
 
 	export let checked: boolean;
 	export let label: string;
+	export let groupEnabled: boolean | undefined = undefined;
+
+	const filterId = `toggle-filter-${label.toLowerCase().replace(/\s+/g, '-')}`;
 </script>
 
-<FilterRow enabled={checked} {label} onToggle={(value) => checked = value} />
+<FilterRow 
+	bind:enabled={checked} 
+	{label} 
+	id={filterId}
+	bind:groupEnabled
+/>
