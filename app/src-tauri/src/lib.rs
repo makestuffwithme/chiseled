@@ -2,6 +2,7 @@ use reqwest::Client;
 use tauri::Manager;
 use tauri_plugin_dialog::DialogExt;
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+use tauri_plugin_opener::OpenerExt;
 
 use crate::mapping::mod_pattern_map::ModPatternMap;
 use crate::mapping::base_type_map::BaseTypeMap;
@@ -81,6 +82,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_log::Builder::default().build())
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             if let Err(e) = setup(app) {
                 show_error(app.handle(), e);
@@ -88,7 +90,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![search_trade, minimize_window])
+        .invoke_handler(tauri::generate_handler![search_trade, minimize_window, open_trade_website])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -108,4 +110,26 @@ async fn minimize_window(app_handle: tauri::AppHandle) {
     if let Some(window) = app_handle.get_webview_window("main") {
         let _ = window.hide();
     }
+}
+
+#[tauri::command]
+async fn open_trade_website(filters: String, app_handle: tauri::AppHandle) -> Result<(), String> {
+    let filters: TradeFilters =
+        serde_json::from_str(&filters).map_err(|e| format!("Failed to parse filters: {}", e))?;
+
+    let query = TradeQuery::from_trade_filters(&filters);
+
+    let client = create_client().map_err(|e| format!("Failed to create HTTP client: {}", e))?;
+    let query_id = trade_api::get_query_id(&client, &query).await.map_err(|e| format!("Failed to get query ID: {}", e))?;
+
+    log::info!("Query ID: {}", query_id);
+
+    let url = format!("https://www.pathofexile.com/trade2/search/poe2/Standard/{}", query_id);
+
+    app_handle
+        .opener()
+        .open_url(url, None::<&str>)
+        .map_err(|e| format!("Failed to open URL: {}", e))?;
+
+    Ok(())
 }

@@ -112,3 +112,19 @@ pub async fn search_trade(client: &Client, query: &TradeQuery) -> Result<String,
     log::info!("Final result: {}", result_str);
     Ok(result_str)
 }
+
+pub async fn get_query_id(client: &Client, query: &TradeQuery) -> Result<String, String> {
+    let response = client
+        .post("https://www.pathofexile.com/api/trade2/search/Standard")
+        .json(&query)
+        .send()
+        .await
+        .map_err(|e| format!("Search request failed: {}", e))?;
+
+    let search_text = response.text().await.map_err(|e| e.to_string())?;
+    let search_json = check_error_response(&search_text).await?;
+
+    log::info!("Search JSON: {}", search_json);
+
+    Ok(search_json["id"].as_str().unwrap_or_default().to_string())
+}

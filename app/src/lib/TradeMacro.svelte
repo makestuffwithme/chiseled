@@ -17,6 +17,18 @@
 	let keydownHandler: (event: KeyboardEvent) => Promise<void>;
 	let uuid = crypto.randomUUID();
 
+	async function openTradeWebsite() {
+		if (!filters) return;
+		try {
+			await invoke('open_trade_website', {
+				filters: JSON.stringify(filters)
+			});
+		} catch (err) {
+			console.error('Error opening trade website:', err);
+			error = String(err);
+		}
+	}
+
 	onMount(async () => {
 		keydownHandler = async (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
@@ -310,13 +322,28 @@
 					]}
 				/>
 
-				<button
-					class="px-4 py-2 w-full bg-primary text-white rounded hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed"
-					on:click={searchTrade}
-					disabled={isLoading}
-				>
-					{isLoading ? 'Searching...' : 'Search Trade'}
-				</button>
+				<div class="flex gap-2">
+					<button
+						class="flex-1 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed"
+						on:click={searchTrade}
+						disabled={isLoading}
+					>
+						{isLoading ? 'Searching...' : 'Search Trade'}
+					</button>
+					<button
+						class="px-3 py-2 bg-primary text-white rounded hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed"
+						on:click={openTradeWebsite}
+						disabled={isLoading}
+						aria-label="Open Trade Website"
+						title="Open Trade Website"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+							<polyline points="15 3 21 3 21 9"></polyline>
+							<line x1="10" y1="14" x2="21" y2="3"></line>
+						</svg>
+					</button>
+				</div>
 			{/key}
 
 			<div class="mt-2">
