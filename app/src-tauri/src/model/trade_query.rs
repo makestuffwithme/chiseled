@@ -204,12 +204,38 @@ impl TradeQuery {
                 has_equipment_filters = true;
             }
         }
+        if let Some(spirit) = &filters.spirit {
+            if spirit.enabled {
+                equipment_filters["spirit"] = json!({"min": spirit.min, "max": spirit.max});
+                has_equipment_filters = true;
+            }
+        }
+        if let Some(block) = &filters.block_chance {
+            if block.enabled {
+                equipment_filters["block"] = json!({"min": block.min, "max": block.max});
+                has_equipment_filters = true;
+            }
+        }
 
         if has_equipment_filters {
             query["filters"]["equipment_filters"] = json!({
                 "filters": equipment_filters,
                 "disabled": false
             });
+        }
+
+        if let Some(drop_chance) = &filters.waystone_drop_chance {
+            if drop_chance.enabled {
+                query["filters"]["map_filters"] = json!({
+                    "filters": {
+                        "map_bonus": {
+                            "min": drop_chance.min,
+                            "max": drop_chance.max
+                        }
+                    },
+                    "disabled": false
+                });
+            }
         }
 
         if filters.price.enabled && !filters.price.option.is_empty() {

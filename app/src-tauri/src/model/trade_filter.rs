@@ -9,18 +9,21 @@ pub struct TradeFilters {
     pub rarity: Option<TextFilter>,
     pub item_level: Option<RangeFilter>,
 
-    // Weapon Properties
+    // Equipment Properties
     pub physical_dps: Option<RangeFilter>,
     pub elemental_dps: Option<RangeFilter>,
     pub total_dps: Option<RangeFilter>,
     pub attack_speed: Option<RangeFilter>,
     pub critical_chance: Option<RangeFilter>,
     pub socket_count: Option<RangeFilter>,
-
-    // Armour Properties
     pub armour: Option<RangeFilter>,
     pub energy_shield: Option<RangeFilter>,
     pub evasion: Option<RangeFilter>,
+    pub spirit: Option<RangeFilter>,
+    pub block_chance: Option<RangeFilter>,
+
+    // Map Properties
+    pub waystone_drop_chance: Option<RangeFilter>,
 
     // Stat Filters
     pub explicit_mods: Vec<StatFilter>,
@@ -177,6 +180,9 @@ impl TradeFilters {
             armour: None,
             energy_shield: None,
             evasion: None,
+            spirit: None,
+            block_chance: None,
+            waystone_drop_chance: None,
             explicit_mods: Vec::new(),
             implicit_mods: Vec::new(),
             rune_mods: Vec::new(),
@@ -290,7 +296,44 @@ impl TradeFilters {
                 continue;
             }
 
-            if let Some(sockets) = line.strip_prefix("Sockets: ") {
+            if let Some(drop_chance) = line.strip_prefix("Waystone Drop Chance: ") {
+                let drop_chance: f64 = drop_chance
+                    .trim_start_matches('+')
+                    .trim_end_matches("% (augmented)")
+                    .trim_end_matches('%')
+                    .trim()
+                    .parse()
+                    .map_err(|e| format!("Failed to parse waystone drop chance value: {}", e))?;
+                filters.waystone_drop_chance = Some(RangeFilter {
+                    min: Some(drop_chance),
+                    max: None,
+                    enabled: true,
+                });
+            } else if let Some(block) = line.strip_prefix("Block chance: ") {
+                let block: f64 = block
+                    .trim_end_matches("% (augmented)")
+                    .trim_end_matches('%')
+                    .trim()
+                    .parse()
+                    .map_err(|e| format!("Failed to parse block chance value: {}", e))?;
+                filters.block_chance = Some(RangeFilter {
+                    min: Some(block),
+                    max: None,
+                    enabled: true,
+                });
+            } else if let Some(spirit) = line.strip_prefix("Spirit: ") {
+                let spirit: f64 = spirit
+                    .split_whitespace()
+                    .next()
+                    .unwrap_or("0")
+                    .parse()
+                    .map_err(|e| format!("Failed to parse spirit value: {}", e))?;
+                filters.spirit = Some(RangeFilter {
+                    min: Some(spirit),
+                    max: None,
+                    enabled: true,
+                });
+            } else if let Some(sockets) = line.strip_prefix("Sockets: ") {
                 let socket_count = sockets.split_whitespace().count();
                 filters.socket_count = Some(RangeFilter {
                     min: Some(socket_count as f64),
@@ -344,7 +387,8 @@ impl TradeFilters {
                 });
             } else if let Some(crit) = line.strip_prefix("Critical Hit Chance: ") {
                 let crit = crit
-                    .trim_end_matches("%")
+                    .trim_end_matches("% (augmented)")
+                    .trim_end_matches('%')
                     .split_whitespace()
                     .next()
                     .unwrap_or("0")

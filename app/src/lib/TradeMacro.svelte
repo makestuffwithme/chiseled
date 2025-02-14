@@ -109,20 +109,22 @@
 					To start, hover over an item in POE2 and press <kbd class="px-2 py-1 bg-surface rounded"
 						>Ctrl+D</kbd
 					>
-				</p><br>
+				</p>
+				<br />
 				<p class="text-text-muted">
-					Press <kbd class="px-2 py-1 bg-surface rounded">Esc</kbd> to minimize the window and return to POE2
+					Press <kbd class="px-2 py-1 bg-surface rounded">Esc</kbd> to minimize the window and return
+					to POE2
 				</p>
 			</div>
 		</div>
 	{:else}
 		<div class="p-2 pt-1">
 			{#key uuid}
-				<FilterGroup 
+				<FilterGroup
 					title="Item Filters"
 					filters={[
 						filters.item_category && {
-							label: "Item Category",
+							label: 'Item Category',
 							textFilter: filters.item_category,
 							options: [
 								// One-Handed Weapons
@@ -195,90 +197,94 @@
 							]
 						},
 						filters.item_name && {
-							label: "Item Name",
+							label: 'Item Name',
 							textFilter: filters.item_name,
 							readonly: true
 						},
 						filters.item_base_type && {
-							label: "Base Type",
+							label: 'Base Type',
 							textFilter: filters.item_base_type,
 							readonly: true
 						},
 						filters.rarity && {
-							label: "Rarity",
+							label: 'Rarity',
 							textFilter: filters.rarity,
 							options: [
-								{ value: "", label: "Any Rarity"},
-								{ value: "unique", label: "Unique"},
-								{ value: "rare", label: "Rare"},
-								{ value: "magic", label: "Magic"},
-								{ value: "normal", label: "Normal"},
-								{ value: "nonunique", label: "Any Non-Unique"},
+								{ value: '', label: 'Any Rarity' },
+								{ value: 'unique', label: 'Unique' },
+								{ value: 'rare', label: 'Rare' },
+								{ value: 'magic', label: 'Magic' },
+								{ value: 'normal', label: 'Normal' },
+								{ value: 'nonunique', label: 'Any Non-Unique' }
 							]
 						},
 						filters.item_level && {
-							label: "Item Level",
+							label: 'Item Level',
 							rangeFilter: filters.item_level
 						},
 						filters.socket_count && {
-							label: "Socket Count",
+							label: 'Socket Count',
 							rangeFilter: filters.socket_count
+						},
+						filters.waystone_drop_chance && {
+							label: 'Waystone Drop Chance',
+							rangeFilter: filters.waystone_drop_chance
 						}
 					].filter((f): f is NonNullable<typeof f> => Boolean(f))}
 				/>
 
-				{#if filters.attack_speed || filters.physical_dps || filters.elemental_dps || filters.total_dps || filters.critical_chance}
-					<FilterGroup 
-						title="Damage Filters"
+				{#if filters.attack_speed || filters.physical_dps || filters.elemental_dps || filters.total_dps || filters.critical_chance || filters.armour || filters.energy_shield || filters.evasion || filters.spirit || filters.block_chance}
+					<FilterGroup
+						title="Equipment Filters"
 						filters={[
 							filters.attack_speed && {
-								label: "Attacks per Second",
+								label: 'Attacks per Second',
 								rangeFilter: filters.attack_speed
 							},
 							filters.physical_dps && {
-								label: "Physical DPS",
+								label: 'Physical DPS',
 								rangeFilter: filters.physical_dps
 							},
 							filters.elemental_dps && {
-								label: "Elemental DPS",
+								label: 'Elemental DPS',
 								rangeFilter: filters.elemental_dps
 							},
 							filters.total_dps && {
-								label: "Total DPS",
+								label: 'Total DPS',
 								rangeFilter: filters.total_dps
 							},
 							filters.critical_chance && {
-								label: "Critical Hit Chance",
+								label: 'Critical Hit Chance',
 								rangeFilter: filters.critical_chance
-							}
-						].filter((f): f is NonNullable<typeof f> => Boolean(f))}
-					/>
-				{/if}
-
-				{#if filters.armour || filters.energy_shield || filters.evasion}
-					<FilterGroup 
-						title="Armour Filters"
-						filters={[
+							},
 							filters.armour && {
-								label: "Armour",
+								label: 'Armour',
 								rangeFilter: filters.armour
 							},
 							filters.energy_shield && {
-								label: "Energy Shield",
+								label: 'Energy Shield',
 								rangeFilter: filters.energy_shield
 							},
 							filters.evasion && {
-								label: "Evasion",
+								label: 'Evasion',
 								rangeFilter: filters.evasion
+							},
+							filters.spirit && {
+								label: 'Spirit',
+								rangeFilter: filters.spirit
+							},
+							filters.block_chance && {
+								label: 'Block Chance',
+								rangeFilter: filters.block_chance
 							}
 						].filter((f): f is NonNullable<typeof f> => Boolean(f))}
 					/>
 				{/if}
 
 				{#if filters.explicit_mods.length > 0}
-					<FilterGroup 
+					<FilterGroup
 						title="Explicit Mods"
-						filters={filters.explicit_mods.map(mod => ({
+						filters={filters.explicit_mods.map((mod) => ({
 							label: mod.text,
 							statFilter: mod
 						}))}
@@ -286,9 +292,9 @@
 				{/if}
 
 				{#if filters.implicit_mods.length > 0}
-					<FilterGroup 
+					<FilterGroup
 						title="Implicit Mods"
-						filters={filters.implicit_mods.map(mod => ({
+						filters={filters.implicit_mods.map((mod) => ({
 							label: mod.text,
 							statFilter: mod
 						}))}
@@ -296,27 +302,27 @@
 				{/if}
 
 				{#if filters.rune_mods.length > 0}
-					<FilterGroup 
+					<FilterGroup
 						title="Rune Mods"
-						filters={filters.rune_mods.map(mod => ({
+						filters={filters.rune_mods.map((mod) => ({
 							label: mod.text,
 							statFilter: mod
 						}))}
 					/>
 				{/if}
 
-				<FilterGroup 
+				<FilterGroup
 					title="Trade Filters"
 					filters={[
 						{
-							label: "Online Only",
+							label: 'Online Only',
 							toggleFilter: {
 								enabled: filters.online_only,
-								label: "Online Only"
+								label: 'Online Only'
 							}
 						},
 						{
-							label: "Price",
+							label: 'Price',
 							priceFilter: filters.price
 						}
 					]}
@@ -337,7 +343,16 @@
 						aria-label="Open Trade Website"
 						title="Open Trade Website"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
 							<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
 							<polyline points="15 3 21 3 21 9"></polyline>
 							<line x1="10" y1="14" x2="21" y2="3"></line>
