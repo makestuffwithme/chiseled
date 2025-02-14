@@ -4,6 +4,12 @@ use serde::{Deserialize, Serialize};
 #[serde(rename_all = "snake_case")]
 pub struct TradeResult {
     pub result: Vec<ItemListing>,
+    #[serde(default)]
+    pub total: usize,
+    #[serde(default)]
+    pub current_page: usize,
+    #[serde(default)]
+    pub total_pages: usize,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

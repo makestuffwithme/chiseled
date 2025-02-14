@@ -96,13 +96,13 @@ pub fn run() {
 }
 
 #[tauri::command]
-async fn search_trade(filters: String) -> Result<String, String> {
+async fn search_trade(filters: String, page: u32) -> Result<String, String> {
     let filters: TradeFilters =
         serde_json::from_str(&filters).map_err(|e| format!("Failed to parse filters: {}", e))?;
 
     let query = TradeQuery::from_trade_filters(&filters);
     let client = create_client().map_err(|e| format!("Failed to create HTTP client: {}", e))?;
-    trade_api::search_trade(&client, &query).await
+    trade_api::search_trade(&client, &query, page).await
 }
 
 #[tauri::command]

@@ -47,7 +47,7 @@ pub async fn fetch_mappings(client: &Client) -> Result<(Value, Value), String> {
     tokio::try_join!(fetch_stats(client), fetch_items(client))
 }
 
-pub async fn search_trade(client: &Client, query: &TradeQuery) -> Result<String, String> {
+pub async fn search_trade(client: &Client, query: &TradeQuery, page: u32) -> Result<String, String> {
     // Search for items
     let response = client
         .post("https://www.pathofexile.com/api/trade2/search/Standard")
@@ -63,12 +63,21 @@ pub async fn search_trade(client: &Client, query: &TradeQuery) -> Result<String,
 
     log::info!("Search JSON: {}", search_json);
 
-    // Extract the first 10 result IDs
+    // Calculate pagination offsets
+    let per_page = 10;
+    let start_idx = (page as usize - 1) * per_page;
+    let total_results = search_json["result"]
+        .as_array()
+        .map(|arr| arr.len())
+        .unwrap_or(0);
+
+    // Extract paginated result IDs
     let result_ids = search_json["result"]
         .as_array()
         .ok_or("No results found")?
         .iter()
-        .take(10)
+        .skip(start_idx)
+        .take(per_page)
         .map(|v| v.as_str().unwrap_or_default())
         .collect::<Vec<_>>()
         .join(",");
@@ -92,8 +101,8 @@ pub async fn search_trade(client: &Client, query: &TradeQuery) -> Result<String,
     let fetch_text = fetch_response.text().await.map_err(|e| e.to_string())?;
     check_error_response(&fetch_text).await?;
 
-    // Parse into our TradeResult struct
-    let trade_result: TradeResult = match serde_json::from_str(&fetch_text) {
+    // Parse into our TradeResult struct and add pagination metadata
+    let mut trade_result: TradeResult = match serde_json::from_str(&fetch_text) {
         Ok(result) => result,
         Err(e) => {
             log::error!("Failed to parse fetch response: {}", e);
@@ -104,6 +113,11 @@ pub async fn search_trade(client: &Client, query: &TradeQuery) -> Result<String,
             ));
         }
     };
+
+    // Add pagination metadata to the result
+    trade_result.total = total_results;
+    trade_result.current_page = page as usize;
+    trade_result.total_pages = (total_results + per_page - 1) / per_page;
 
     // Convert back to string to return
     let result_str = serde_json::to_string(&trade_result)

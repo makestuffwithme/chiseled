@@ -9,13 +9,21 @@
 	import SearchResults from './components/SearchResults.svelte';
 	import type { TradeFilters } from './types/filters';
 
-	let searchResults: any = null;
+	interface TradeSearchResults {
+		result: any[];
+		total: number;
+		current_page: number;
+		total_pages: number;
+	}
+
+	let searchResults: TradeSearchResults | null = null;
 	let isLoading = false;
 	let error: string | null = null;
 	let filters: TradeFilters | null = null;
 	let hasBeenResized = false;
 	let keydownHandler: (event: KeyboardEvent) => Promise<void>;
 	let uuid = crypto.randomUUID();
+	let currentPage = 1;
 
 	async function openTradeWebsite() {
 		if (!filters) return;
@@ -81,14 +89,16 @@
 		}
 	});
 
-	async function searchTrade() {
+	async function searchTrade(page: number = 1) {
 		if (!filters) return;
 
 		try {
 			isLoading = true;
 			error = null;
+			currentPage = page;
 			const response = (await invoke('search_trade', {
-				filters: JSON.stringify(filters)
+				filters: JSON.stringify(filters),
+				page
 			})) as string;
 			searchResults = JSON.parse(response);
 		} catch (err) {
@@ -98,6 +108,11 @@
 		} finally {
 			isLoading = false;
 		}
+	}
+
+	function handlePageChange(newPage: number) {
+		if (newPage < 1 || (searchResults && newPage > searchResults.total_pages)) return;
+		searchTrade(newPage);
 	}
 </script>
 
@@ -331,7 +346,7 @@
 				<div class="flex gap-2">
 					<button
 						class="flex-1 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 disabled:bg-gray-400 disabled:cursor-not-allowed"
-						on:click={searchTrade}
+						on:click={() => searchTrade()}
 						disabled={isLoading}
 					>
 						{isLoading ? 'Searching...' : 'Search Trade'}
@@ -371,7 +386,12 @@
 						{filters ? 'Searching trade...' : 'Parsing item...'}
 					</div>
 				{:else if searchResults?.result}
-					<SearchResults results={searchResults.result} />
+					<SearchResults 
+						results={searchResults.result}
+						currentPage={searchResults.current_page}
+						totalPages={searchResults.total_pages}
+						onPageChange={handlePageChange}
+					/>
 				{/if}
 			</div>
 		</div>

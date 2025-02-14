@@ -81,6 +81,10 @@
 		};
 	}[] = [];
 
+	export let currentPage: number = 1;
+	export let totalPages: number = 1;
+	export let onPageChange: (page: number) => void;
+
 	let container: HTMLElement;
 
 	function getRelativeTime(date: string | undefined): string {
@@ -152,6 +156,10 @@
 			popover.style.marginTop = '4px';
 			popover.style.marginBottom = '0';
 		}
+	}
+
+	function handlePageClick(page: number) {
+		onPageChange(page);
 	}
 </script>
 
@@ -320,8 +328,87 @@
 				</div>
 			{/each}
 		</div>
+
+		<!-- Pagination Controls -->
+		{#if totalPages > 1}
+			<div class="flex justify-center items-center gap-2 mt-2 pb-1 text-xs">
+				<button
+					class="p-0.5 text-text rounded bg-surface hover:bg-surface/80 disabled:opacity-50 disabled:cursor-not-allowed"
+					disabled={currentPage === 1}
+					on:click={() => handlePageClick(currentPage - 1)}
+					aria-label="Previous"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M15 18l-6-6 6-6"/>
+					</svg>
+				</button>
+				
+				<div class="flex items-center gap-1 text-text">
+					{#if currentPage > 2}
+						<button
+							class="px-1 py-1 rounded hover:bg-surface/80"
+							on:click={() => handlePageClick(1)}
+						>
+							1
+						</button>
+						{#if currentPage > 3}
+							<span class="px-1">...</span>
+						{/if}
+					{/if}
+
+					{#if currentPage > 1}
+						<button
+							class="px-2 py-1 rounded hover:bg-surface/80"
+							on:click={() => handlePageClick(currentPage - 1)}
+						>
+							{currentPage - 1}
+						</button>
+					{/if}
+
+					<button
+						class="px-2 py-1 rounded bg-primary text-white"
+					>
+						{currentPage}
+					</button>
+
+					{#if currentPage < totalPages}
+						<button
+							class="px-2 py-1 rounded hover:bg-surface/80"
+							on:click={() => handlePageClick(currentPage + 1)}
+						>
+							{currentPage + 1}
+						</button>
+					{/if}
+
+					{#if currentPage < totalPages - 1}
+						{#if currentPage < totalPages - 2}
+							<span class="px-1">...</span>
+						{/if}
+						<button
+							class="px-2 py-1 rounded hover:bg-surface/80"
+							on:click={() => handlePageClick(totalPages)}
+						>
+							{totalPages}
+						</button>
+					{/if}
+				</div>
+
+				<button
+					class="p-0.5 text-text rounded bg-surface hover:bg-surface/80 disabled:opacity-50 disabled:cursor-not-allowed"
+					disabled={currentPage === totalPages}
+					on:click={() => handlePageClick(currentPage + 1)}
+					aria-label="Next"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M9 18l6-6-6-6"/>
+					</svg>
+				</button>
+			</div>
+		{/if}
 	{:else}
-		<p class="text-text-muted italic">No items found matching your search.</p>
+		<div class="text-center py-4 text-text-muted">
+			No results found
+		</div>
 	{/if}
 </div>
 
