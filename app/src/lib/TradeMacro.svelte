@@ -181,6 +181,9 @@
 								{ value: 'accessory.belt', label: 'Belt' },
 								{ value: 'accessory.ring', label: 'Ring' },
 
+								// Jewels
+								{ value: 'jewel', label: 'Jewel' },
+
 								// Gems
 								{ value: 'gem', label: 'Any Gem' },
 								{ value: 'gem.activegem', label: 'Skill Gem' },

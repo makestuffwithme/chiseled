@@ -130,6 +130,9 @@ impl TradeFilters {
             "belts" => "accessory.belt",
             "rings" => "accessory.ring",
 
+            // Jewels
+            "jewels" => "jewel",
+
             // Gems
             "active skill gems" => "gem.activegem",
             "support skill gems" => "gem.supportgem",
