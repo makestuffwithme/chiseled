@@ -139,23 +139,10 @@
 		const popover = target.querySelector('.item-details-popover') as HTMLElement;
 		if (!popover || !container) return;
 
-		const rect = target.getBoundingClientRect();
-		const popoverHeight = popover.offsetHeight;
-		const windowHeight = window.innerHeight;
-		const spaceBelow = windowHeight - rect.bottom;
-
-		// If there's not enough space below and more space above, show above
-		if (spaceBelow < popoverHeight && rect.top > popoverHeight) {
-			popover.style.top = 'auto';
-			popover.style.bottom = '100%';
-			popover.style.marginTop = '0';
-			popover.style.marginBottom = '4px';
-		} else {
-			popover.style.top = '100%';
-			popover.style.bottom = 'auto';
-			popover.style.marginTop = '4px';
-			popover.style.marginBottom = '0';
-		}
+		popover.style.top = 'auto';
+		popover.style.bottom = '100%';
+		popover.style.marginTop = '0';
+		popover.style.marginBottom = '4px';
 	}
 
 	function handlePageClick(page: number) {
