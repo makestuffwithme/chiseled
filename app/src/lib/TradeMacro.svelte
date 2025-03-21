@@ -334,10 +334,7 @@
 					filters={[
 						{
 							label: 'Online Only',
-							toggleFilter: {
-								enabled: filters.online_only,
-								label: 'Online Only'
-							}
+							toggleFilter: filters.online_only,
 						},
 						{
 							label: 'Price',

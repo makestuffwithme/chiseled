@@ -1,7 +1,8 @@
 <script lang="ts">
 	import FilterRow from './FilterRow.svelte';
-
-	export let checked: boolean;
+	import type { ToggleFilter } from '../types/filters';
+	
+	export let filter: ToggleFilter;
 	export let label: string;
 	export let groupEnabled: boolean | undefined = undefined;
 
@@ -9,7 +10,7 @@
 </script>
 
 <FilterRow 
-	bind:enabled={checked} 
+	bind:enabled={filter.enabled} 
 	{label} 
 	id={filterId}
 	bind:groupEnabled

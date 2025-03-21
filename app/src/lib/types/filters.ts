@@ -30,7 +30,6 @@ export interface PriceFilter {
 
 export interface ToggleFilter {
     enabled: boolean;
-    label: string;
 }
 
 export interface FilterConfig {
@@ -69,6 +68,5 @@ export interface TradeFilters {
     implicit_mods: StatFilter[];
     rune_mods: StatFilter[];
     price: PriceFilter;
-    listed_time: string | null;
     online_only: boolean;
 } 

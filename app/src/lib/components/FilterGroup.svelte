@@ -41,8 +41,8 @@
 				<PriceFilterInput bind:filter={filter.priceFilter} groupEnabled={enabled} />
 			{:else if filter.toggleFilter}
 				<ToggleFilter 
-					bind:checked={filter.toggleFilter.enabled}
-					label={filter.toggleFilter.label}
+					bind:filter={filter.toggleFilter}
+					label={filter.label}
 					groupEnabled={enabled}
 				/>
 			{/if}

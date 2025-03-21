@@ -92,7 +92,7 @@ impl TradeQuery {
         // Build the main query
         let mut query = json!({
             "status": {
-                "option": if filters.online_only { "online" } else { "any" }
+                "option": if filters.online_only.enabled { "online" } else { "any" }
             },
             "stats": [{
                 "type": "and",
@@ -238,18 +238,21 @@ impl TradeQuery {
             }
         }
 
+        let mut trade_filters = json!({});
+        trade_filters["collapse"] = json!({ "option": true });
+
         if filters.price.enabled && !filters.price.option.is_empty() {
-            query["filters"]["trade_filters"] = json!({
-                "filters": {
-                    "price": {
-                        "option": filters.price.option,
-                        "min": filters.price.min,
-                        "max": filters.price.max
-                    }
-                },
-                "disabled": false
+            trade_filters["price"] = json!({
+                "option": filters.price.option,
+                "min": filters.price.min,
+                "max": filters.price.max
             });
         }
+
+        query["filters"]["trade_filters"] = json!({
+            "filters": trade_filters,
+            "disabled": false
+        });
 
         Self::new(query)
     }
@@ -258,7 +261,7 @@ impl TradeQuery {
 #[cfg(test)]
 mod test {
     use crate::model::trade_filter::{
-        RangeFilter, StatFilter, StatValue, TextFilter, TradeFilters,
+        RangeFilter, StatFilter, StatValue, TextFilter, TradeFilters, ToggleFilter,
     };
     use crate::model::trade_query::TradeQuery;
 
@@ -280,7 +283,9 @@ mod test {
             text: "weapon.crossbow".to_string(),
             enabled: true,
         });
-        filters.online_only = true;
+        filters.online_only = ToggleFilter {
+            enabled: true,
+        };
 
         // Add an explicit mod with range values
         filters.explicit_mods.push(StatFilter {
@@ -366,7 +371,9 @@ mod test {
             text: "armour.helmet".to_string(),
             enabled: true,
         });
-        filters.online_only = true;
+        filters.online_only = ToggleFilter {
+            enabled: true,
+        };
 
         // Add armour properties
         filters.armour = Some(RangeFilter {

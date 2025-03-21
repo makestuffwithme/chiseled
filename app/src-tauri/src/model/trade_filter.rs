@@ -31,8 +31,7 @@ pub struct TradeFilters {
     pub rune_mods: Vec<StatFilter>,
 
     pub price: PriceFilter,
-    pub listed_time: Option<String>,
-    pub online_only: bool,
+    pub online_only: ToggleFilter,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -68,6 +67,11 @@ pub struct StatFilter {
 pub struct StatValue {
     pub min: Option<f64>,
     pub max: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ToggleFilter {
+    pub enabled: bool,
 }
 
 impl StatValue {
@@ -195,8 +199,9 @@ impl TradeFilters {
                 min: None,
                 max: None,
             },
-            listed_time: None,
-            online_only: true,
+            online_only: ToggleFilter {
+                enabled: true,
+            },
         }
     }
 
