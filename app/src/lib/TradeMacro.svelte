@@ -91,6 +91,13 @@
 				error = null;
 				isLoading = false;
 				filters = parsedFilters;
+				
+				// If we have leagues and the current league is "Standard" (default), 
+				// set it to the first league in the list which should be the newest one
+				if (leagues.length > 0 && filters && filters.league?.text === 'Standard') {
+					filters.league.text = leagues[0].id;
+				}
+				
 				// we use a uuid here to guarantee a fresh form each time we get new filters
 				uuid = crypto.randomUUID();
 			} catch (err) {

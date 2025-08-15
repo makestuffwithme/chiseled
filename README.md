@@ -1,6 +1,6 @@
-# price check items in path of exile 2 - [download](https://github.com/butterybearings/chiseled/releases/latest)
+# price check items in path of exile 2 - [download](https://github.com/makestuffwithme/chiseled/releases/latest)
 
-### wanna learn how to make an app like this? [take my course](https://course.butterybearings.com)!
+### wanna learn how to make an app like this? [take my free course](https://www.youtube.com/watch?v=tDNUwMO0CcQ&list=PLf6oSHLbS4BfK2ZMSpuTygSDDpwJF05Sp)!
 
 | armor | weapon | unique |
 |:-----:|:------:|:------:|
