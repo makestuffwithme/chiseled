@@ -7,13 +7,15 @@ use super::trade_filter::TradeFilters;
 pub struct TradeQuery {
     pub query: Value,
     pub sort: Value,
+    pub league: String,
 }
 
 impl TradeQuery {
-    pub fn new(query: Value) -> Self {
+    pub fn new(query: Value, league: String) -> Self {
         Self {
             query,
             sort: json!({ "price": "asc" }),
+            league,
         }
     }
 
@@ -254,7 +256,10 @@ impl TradeQuery {
             "disabled": false
         });
 
-        Self::new(query)
+        let league = filters.league.as_ref()
+            .map(|l| l.text.clone())
+            .unwrap_or_else(|| "Standard".to_string());
+        Self::new(query, league)
     }
 }
 

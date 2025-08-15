@@ -32,6 +32,12 @@ export interface ToggleFilter {
     enabled: boolean;
 }
 
+export interface League {
+    id: string;
+    realm: string;
+    text: string;
+}
+
 export interface FilterConfig {
     label: string;
     statFilter?: StatFilter;
@@ -68,5 +74,6 @@ export interface TradeFilters {
     implicit_mods: StatFilter[];
     rune_mods: StatFilter[];
     price: PriceFilter;
-    online_only: boolean;
+    online_only: ToggleFilter;
+    league: TextFilter | null;
 } 

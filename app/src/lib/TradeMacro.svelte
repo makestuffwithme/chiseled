@@ -7,7 +7,7 @@
 	import { message } from '@tauri-apps/plugin-dialog';
 	import FilterGroup from './components/FilterGroup.svelte';
 	import SearchResults from './components/SearchResults.svelte';
-	import type { TradeFilters } from './types/filters';
+	import type { TradeFilters, League } from './types/filters';
 
 	interface TradeSearchResults {
 		result: any[];
@@ -24,6 +24,20 @@
 	let keydownHandler: (event: KeyboardEvent) => Promise<void>;
 	let uuid = crypto.randomUUID();
 	let currentPage = 1;
+	let leagues: League[] = [];
+	let isLoadingLeagues = false;
+
+	async function fetchLeagues() {
+		try {
+			isLoadingLeagues = true;
+			const response = await invoke('fetch_leagues') as string;
+			leagues = JSON.parse(response);
+		} catch (err) {
+			console.error('Error fetching leagues:', err);
+		} finally {
+			isLoadingLeagues = false;
+		}
+	}
 
 	async function openTradeWebsite() {
 		if (!filters) return;
@@ -38,6 +52,9 @@
 	}
 
 	onMount(async () => {
+		// Fetch leagues on startup
+		await fetchLeagues();
+
 		keydownHandler = async (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
 				event.preventDefault();
@@ -332,6 +349,14 @@
 				<FilterGroup
 					title="Trade Filters"
 					filters={[
+						filters.league && {
+							label: 'League',
+							textFilter: filters.league,
+							options: leagues.map(league => ({
+								value: league.id,
+								label: league.text
+							}))
+						},
 						{
 							label: 'Online Only',
 							toggleFilter: filters.online_only,
@@ -340,7 +365,7 @@
 							label: 'Price',
 							priceFilter: filters.price
 						}
-					]}
+					].filter((f): f is NonNullable<typeof f> => Boolean(f))}
 				/>
 
 				<div class="flex gap-2">

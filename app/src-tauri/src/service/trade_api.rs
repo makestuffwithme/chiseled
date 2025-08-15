@@ -1,8 +1,21 @@
 use reqwest::Client;
 use serde_json::Value;
+use serde::{Deserialize, Serialize};
 
 use crate::model::trade_query::TradeQuery;
 use crate::model::trade_result::TradeResult;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct League {
+    pub id: String,
+    pub realm: String,
+    pub text: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct LeaguesResponse {
+    pub result: Vec<League>,
+}
 
 async fn check_error_response(response_text: &str) -> Result<Value, String> {
     if !response_text.starts_with('{') {
@@ -47,10 +60,27 @@ pub async fn fetch_mappings(client: &Client) -> Result<(Value, Value), String> {
     tokio::try_join!(fetch_stats(client), fetch_items(client))
 }
 
+pub async fn fetch_leagues(client: &Client) -> Result<Vec<League>, String> {
+    let response = client
+        .get("https://www.pathofexile.com/api/trade2/data/leagues")
+        .send()
+        .await
+        .map_err(|e| format!("Leagues request failed: {}", e))?;
+
+    let text = response.text().await.map_err(|e| e.to_string())?;
+    let json = check_error_response(&text).await?;
+    
+    let leagues_response: LeaguesResponse = serde_json::from_value(json)
+        .map_err(|e| format!("Failed to parse leagues response: {}", e))?;
+    
+    Ok(leagues_response.result)
+}
+
 pub async fn search_trade(client: &Client, query: &TradeQuery, page: u32) -> Result<String, String> {
     // Search for items
+    let encoded_league = urlencoding::encode(&query.league);
     let response = client
-        .post("https://www.pathofexile.com/api/trade2/search/Standard")
+        .post(format!("https://www.pathofexile.com/api/trade2/search/{}", encoded_league))
         .json(&query)
         .send()
         .await
@@ -128,8 +158,9 @@ pub async fn search_trade(client: &Client, query: &TradeQuery, page: u32) -> Res
 }
 
 pub async fn get_query_id(client: &Client, query: &TradeQuery) -> Result<String, String> {
+    let encoded_league = urlencoding::encode(&query.league);
     let response = client
-        .post("https://www.pathofexile.com/api/trade2/search/Standard")
+        .post(format!("https://www.pathofexile.com/api/trade2/search/{}", encoded_league))
         .json(&query)
         .send()
         .await

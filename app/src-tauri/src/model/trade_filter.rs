@@ -32,6 +32,7 @@ pub struct TradeFilters {
 
     pub price: PriceFilter,
     pub online_only: ToggleFilter,
+    pub league: Option<TextFilter>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
@@ -202,6 +203,10 @@ impl TradeFilters {
             online_only: ToggleFilter {
                 enabled: true,
             },
+            league: Some(TextFilter {
+                text: "Standard".to_string(),
+                enabled: true,
+            }),
         }
     }
 

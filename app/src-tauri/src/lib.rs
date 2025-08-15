@@ -90,7 +90,7 @@ pub fn run() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![search_trade, minimize_window, open_trade_website])
+        .invoke_handler(tauri::generate_handler![search_trade, minimize_window, open_trade_website, fetch_leagues])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -124,7 +124,8 @@ async fn open_trade_website(filters: String, app_handle: tauri::AppHandle) -> Re
 
     log::info!("Query ID: {}", query_id);
 
-    let url = format!("https://www.pathofexile.com/trade2/search/poe2/Standard/{}", query_id);
+    let encoded_league = urlencoding::encode(&query.league);
+    let url = format!("https://www.pathofexile.com/trade2/search/poe2/{}/{}", encoded_league, query_id);
 
     app_handle
         .opener()
@@ -132,4 +133,11 @@ async fn open_trade_website(filters: String, app_handle: tauri::AppHandle) -> Re
         .map_err(|e| format!("Failed to open URL: {}", e))?;
 
     Ok(())
+}
+
+#[tauri::command]
+async fn fetch_leagues() -> Result<String, String> {
+    let client = create_client().map_err(|e| format!("Failed to create HTTP client: {}", e))?;
+    let leagues = trade_api::fetch_leagues(&client).await?;
+    serde_json::to_string(&leagues).map_err(|e| format!("Failed to serialize leagues: {}", e))
 }
