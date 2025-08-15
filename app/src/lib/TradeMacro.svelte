@@ -26,6 +26,24 @@
 	let currentPage = 1;
 	let leagues: League[] = [];
 	let isLoadingLeagues = false;
+	let isInitializingFilters = false;
+
+	// Storage key for league preference
+	const LEAGUE_PREFERENCE_KEY = 'last-selected-league';
+
+	function saveLeaguePreference(leagueId: string) {
+		localStorage.setItem(LEAGUE_PREFERENCE_KEY, leagueId);
+	}
+
+	function getLeaguePreference(): string | null {
+		return localStorage.getItem(LEAGUE_PREFERENCE_KEY);
+	}
+
+	function handleLeagueChange(value: string) {
+		if (!isInitializingFilters) {
+			saveLeaguePreference(value);
+		}
+	}
 
 	async function fetchLeagues() {
 		try {
@@ -92,10 +110,23 @@
 				isLoading = false;
 				filters = parsedFilters;
 				
-				// If we have leagues and the current league is "Standard" (default), 
-				// set it to the first league in the list which should be the newest one
-				if (leagues.length > 0 && filters && filters.league?.text === 'Standard') {
-					filters.league.text = leagues[0].id;
+				if (leagues.length > 0 && filters && filters.league) {
+					isInitializingFilters = true;
+					
+					const savedPreference = getLeaguePreference();
+					const leagueExists = savedPreference && leagues.some(league => league.id === savedPreference);
+					
+					if (leagueExists) {
+						filters.league.text = savedPreference;
+					} else {
+						// Use first league (most recent)
+						filters.league.text = leagues[0].id;
+					}
+				
+					// Allow reactive saving again after a brief delay
+					setTimeout(() => {
+						isInitializingFilters = false;
+					}, 100);
 				}
 				
 				// we use a uuid here to guarantee a fresh form each time we get new filters
@@ -362,7 +393,8 @@
 							options: leagues.map(league => ({
 								value: league.id,
 								label: league.text
-							}))
+							})),
+							onChange: handleLeagueChange
 						},
 						{
 							label: 'Online Only',

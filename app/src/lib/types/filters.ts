@@ -47,6 +47,7 @@ export interface FilterConfig {
     toggleFilter?: ToggleFilter;
     options?: { value: string; label: string }[];
     readonly?: boolean;
+    onChange?: (value: string) => void;
 }
 
 export interface TradeFilters {

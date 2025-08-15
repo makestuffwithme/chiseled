@@ -36,6 +36,7 @@
 					options={filter.options}
 					readonly={filter.readonly}
 					groupEnabled={enabled}
+					onChange={filter.onChange}
 				/>
 			{:else if filter.priceFilter}
 				<PriceFilterInput bind:filter={filter.priceFilter} groupEnabled={enabled} />
