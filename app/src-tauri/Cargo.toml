@@ -1,6 +1,6 @@
 [package]
 name = "chiseled"
-version = "1.3.3"
+version = "1.4.0"
 description = "price check items in POE2"
 authors = ["makestuffwithme"]
 license = "MIT"
